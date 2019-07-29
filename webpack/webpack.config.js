@@ -1,8 +1,8 @@
-const path = require('path');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const Fiber = require('fibers');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const Fiber = require('fibers')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
   entry: './src/index.js',
@@ -24,16 +24,19 @@ module.exports = {
     rules: [{
       test: /\.scss$/,
       use: [{
-        loader: process.env.NODE_ENV !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader, options: {
+        loader: process.env.NODE_ENV !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader,
+        options: {
           sourceMap: true
         }
       }, {
-        loader: "css-loader", options: {
+        loader: 'css-loader',
+        options: {
           sourceMap: true
         }
       }, {
-        loader: "sass-loader", options: {
-          implementation: require("sass"),
+        loader: 'sass-loader',
+        options: {
+          implementation: require('sass'),
           fiber: Fiber,
           sourceMap: true
         }
