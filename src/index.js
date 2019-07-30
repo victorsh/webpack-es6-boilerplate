@@ -1,7 +1,9 @@
-import * as PIXI from 'pixi.js'
 import _ from 'lodash'
 import './css/index.scss'
-import Trash from './img/trash.png'
+import * as Test from './scripts/test'
+import * as PIXISTART from './scripts/pixi-starter'
+
+process.env.NODE_ENV === 'production' ? console.log('in production') : console.log('in development')
 
 function component () {
   const element = document.createElement('div')
@@ -10,27 +12,8 @@ function component () {
   return element
 }
 
+Test.test()
+
 document.body.appendChild(component())
 
-const trashImg = document.createElement('img')
-trashImg.src = Trash
-
-// document.body.appendChild(trashImg);
-
-const app = new PIXI.Application()
-document.body.appendChild(app.view)
-app.loader.add('trash', Trash).load((loader, resources) => {
-  const trash = new PIXI.Sprite(resources.trash.texture)
-
-  trash.x = app.renderer.width / 2
-  trash.y = app.renderer.height / 2
-
-  trash.anchor.x = 0.5
-  trash.anchor.y = 0.5
-
-  app.stage.addChild(trash)
-
-  app.ticker.add(() => {
-    trash.rotation += 0.01
-  })
-})
+PIXISTART.pixelRun()
