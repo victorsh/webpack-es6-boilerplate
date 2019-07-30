@@ -1,6 +1,7 @@
 const merge = require('webpack-merge')
 const common = require('./webpack.common.js')
 const Fiber = require('fibers')
+var DashboardPlugin = require("webpack-dashboard/plugin");
 
 module.exports = merge(common, {
   mode: 'development',
@@ -8,6 +9,9 @@ module.exports = merge(common, {
   devServer: {
     contentBase: './dist'
   },
+  plugins: [
+    new DashboardPlugin()
+  ],
   module: {
     rules: [{
       test: /\.scss$/,
