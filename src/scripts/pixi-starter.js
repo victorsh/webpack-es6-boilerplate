@@ -24,4 +24,12 @@ export const pixelRun = () => {
       trash.rotation += 0.01
     })
   })
+
+  const resize = () => {
+    app.renderer.resize(window.innerWidth, window.innerHeight)
+  }
+
+  window.addEventListener('resize', resize)
+
+  resize()
 }
