@@ -1,7 +1,6 @@
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = {
   entry: './src/index.js',
@@ -9,8 +8,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Production'
-    }),
-    new BundleAnalyzerPlugin({ openAnalyzer: false })
+    })
   ],
   output: {
     filename: 'main.js',

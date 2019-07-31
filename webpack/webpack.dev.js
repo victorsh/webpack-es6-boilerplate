@@ -1,7 +1,8 @@
 const merge = require('webpack-merge')
 const common = require('./webpack.common.js')
 const Fiber = require('fibers')
-var DashboardPlugin = require("webpack-dashboard/plugin");
+const DashboardPlugin = require('webpack-dashboard/plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = merge(common, {
   mode: 'development',
@@ -10,7 +11,8 @@ module.exports = merge(common, {
     contentBase: './dist'
   },
   plugins: [
-    new DashboardPlugin()
+    new DashboardPlugin(),
+    new BundleAnalyzerPlugin({ openAnalyzer: false })
   ],
   module: {
     rules: [{
