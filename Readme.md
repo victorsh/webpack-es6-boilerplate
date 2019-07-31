@@ -13,4 +13,7 @@ A boilerplate for building web applications
 - `npm i`
 - Run Development: `npm start`
 - Build and Run Production: `npm run build`
+  - Go to: http://localhost:8080
+  - For Bundle Analyzer go to: http://localhost:8888
 - Clear Production Build: `npm run clean`
+  - Go to: http://localhost:3000
