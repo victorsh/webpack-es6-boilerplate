@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch --config ./webpack/webpack.config.js",
-    "start": "webpack-dashboard -- webpack-dev-server --open --config ./webpack/webpack.dev.js",
-    "build": "rm  -f./stage/public/* && webpack --config ./webpack/webpack.prod.js && cp ./dist/* ./stage/public && node ./stage/server.js",
+    "start": "webpack-dashboard -- webpack-dev-server --port 8080 --open --config ./webpack/webpack.dev.js",
+    "build": "rm  -f ./stage/public/* && webpack --config ./webpack/webpack.prod.js && cp ./dist/* ./stage/public && node ./stage/server.js",
     "clean": "rm  -f ./stage/public/* && rm -f ./dist/*"
   },
   "author": "Victor Shahbazian",
@@ -35,6 +35,7 @@
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.38.0",
+    "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.6",
     "webpack-dashboard": "^3.0.7",
     "webpack-dev-server": "^3.7.2",
