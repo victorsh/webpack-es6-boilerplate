@@ -8,7 +8,8 @@
     "watch": "webpack --watch --config ./webpack/webpack.config.js",
     "start": "webpack-dashboard -- webpack-dev-server --port 8080 --open --config ./webpack/webpack.dev.js",
     "build": "rm  -f ./stage/public/* && webpack --config ./webpack/webpack.prod.js && cp ./dist/* ./stage/public && node ./stage/server.js",
-    "clean": "rm  -f ./stage/public/* && rm -f ./dist/*"
+    "clean": "rm  -f ./stage/public/* && rm -f ./dist/*",
+    "devNode": "node ./stage/server.js"
   },
   "author": "Victor Shahbazian",
   "license": "MIT",
@@ -38,11 +39,14 @@
     "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.6",
     "webpack-dashboard": "^3.0.7",
+    "webpack-dev-middleware": "^3.7.0",
     "webpack-dev-server": "^3.7.2",
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
     "@babel/runtime": "^7.5.5",
+    "@tensorflow/tfjs": "^1.2.5",
+    "@tensorflow/tfjs-vis": "^1.1.0",
     "lodash": "^4.17.15",
     "pixi.js": "^5.1.0"
   }
