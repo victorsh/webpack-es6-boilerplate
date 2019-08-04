@@ -9,9 +9,7 @@
     "nodefront": "NODE_ENV=development PORT=8080 nodemon devServer.js",
     "stage": "npm run build && concurrently --kill-others \"node ./stage/server.js\" \"nodemon ./backend/server.js localhost 9000\"",
     "build": "npm run clean && webpack --config ./webpack/webpack.prod.js && cp ./dist/* ./stage/public",
-    "clean": "rm  -f ./stage/public/* && rm -f ./dist/*",
-    "watch": "webpack --watch --config ./webpack/webpack.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm  -f ./stage/public/* && rm -f ./dist/*"
   },
   "author": "Victor Shahbazian",
   "license": "MIT",
