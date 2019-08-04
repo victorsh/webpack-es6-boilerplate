@@ -22,6 +22,7 @@ export const pixelRun = () => {
 
     app.ticker.add(() => {
       tempObject.rotation += 0.01
+      updateMove(tempObject)
     })
   })
 
@@ -62,4 +63,19 @@ export const pixelRun = () => {
       down = false
     }
   })
+}
+
+const updateMove = (tempObject) => {
+  if (left) {
+    tempObject.x -= 1
+  }
+  if (up) {
+    tempObject.y -= 1
+  }
+  if (right) {
+    tempObject.x += 1
+  }
+  if (down) {
+    tempObject.y += 1
+  }
 }
