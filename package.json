@@ -4,7 +4,8 @@
   "description": "A boilerplate for all es6 based needs.",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"webpack-dev-server --port 8080 --open --config ./webpack/webpack.dev.js\" \"nodemon ./backend/server.js localhost 9000\"",
+    "webpackdev": "concurrently \"webpack-dev-server --port 8080 --open --config ./webpack/webpack.dev.js\" \"nodemon ./backend/server.js localhost 9000\"",
+    "nodedev": "concurrently \"NODE_ENV=development PORT=8080 nodemon devServer.js\" \"nodemon ./backend/server.js localhost 9000\"",
     "stage": "npm run build && concurrently --kill-others \"node ./stage/server.js\" \"nodemon ./backend/server.js localhost 9000\"",
     "build": "npm run clean && webpack --config ./webpack/webpack.prod.js && cp ./dist/* ./stage/public",
     "clean": "rm  -f ./stage/public/* && rm -f ./dist/*",
