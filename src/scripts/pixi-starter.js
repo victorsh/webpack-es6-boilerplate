@@ -1,6 +1,11 @@
 import TempImg from '../img/trash.png'
 import * as PIXI from 'pixi.js'
 
+let left = false
+let up = false
+let right = false
+let down = false
+
 export const pixelRun = () => {
   const app = new PIXI.Application()
   document.body.appendChild(app.view)
@@ -27,4 +32,34 @@ export const pixelRun = () => {
   window.addEventListener('resize', resize)
 
   resize()
+
+  document.addEventListener('keydown', (e) => {
+    if (e.keyCode === 37) { // left
+      left = true
+    }
+    if (e.keyCode === 38) { // up
+      up = true
+    }
+    if (e.keyCode === 39) { // right
+      right = true
+    }
+    if (e.keyCode === 40) { // down
+      down = true
+    }
+  })
+
+  document.addEventListener('keyup', (e) => {
+    if (e.keyCode === 37) { // left
+      left = false
+    }
+    if (e.keyCode === 38) { // up
+      up = false
+    }
+    if (e.keyCode === 39) { // right
+      right = false
+    }
+    if (e.keyCode === 40) { // down
+      down = false
+    }
+  })
 }
