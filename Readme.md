@@ -17,4 +17,8 @@ A boilerplate for building web applications
 - Build and Run Production: `npm run build`
   - Go to: http://localhost:3000
 - Clear Production Build: `npm run clean`
-  
+
+
+#### What's Included
+- Webpack Dev and Production Configuration
+- Server Workers

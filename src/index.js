@@ -2,7 +2,18 @@ import join from 'lodash/join'
 import './css/index.scss'
 import * as Test from './scripts/test'
 import * as PIXISTART from './scripts/pixi-starter'
+
 const _ = { join }
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(registration => {
+      console.log('SW Registered: ', registration)
+    }).catch(registrationError => {
+      console.log('Registration Error: ', registrationError)
+    })
+  })
+}
 
 function component () {
   const element = document.createElement('div')

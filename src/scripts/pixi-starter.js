@@ -1,12 +1,20 @@
 import TempImg from '../img/trash.png'
 import * as PIXI from 'pixi.js'
+import * as STATS from 'stats-js'
 
 let left = false
 let up = false
 let right = false
 let down = false
+/* eslint-disable */
+let speed = 3
+/* esling-enable */
 
 export const pixelRun = () => {
+  const stats = new STATS()
+  stats.showPanel(1)
+  document.body.appendChild(stats.dom)
+
   const app = new PIXI.Application()
   document.body.appendChild(app.view)
   app.loader.add('trash', TempImg).load((loader, resources) => {
@@ -20,9 +28,11 @@ export const pixelRun = () => {
 
     app.stage.addChild(tempObject)
 
-    app.ticker.add(() => {
-      tempObject.rotation += 0.01
-      updateMove(tempObject)
+    app.ticker.add((delta) => {
+      stats.begin()
+      tempObject.rotation += 0.01 * delta
+      updateMove(tempObject, delta)
+      stats.end()
     })
   })
 
@@ -65,17 +75,17 @@ export const pixelRun = () => {
   })
 }
 
-const updateMove = (tempObject) => {
+const updateMove = (tempObject, delta) => {
   if (left) {
-    tempObject.x -= 1
+    tempObject.x -= 1 * delta * speed
   }
   if (up) {
-    tempObject.y -= 1
+    tempObject.y -= 1 * delta * speed
   }
   if (right) {
-    tempObject.x += 1
+    tempObject.x += 1 * delta * speed
   }
   if (down) {
-    tempObject.y += 1
+    tempObject.y += 1 * delta * speed
   }
 }
