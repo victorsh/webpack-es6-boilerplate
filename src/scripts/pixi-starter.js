@@ -15,7 +15,9 @@ export const pixelRun = () => {
   stats.showPanel(1)
   document.body.appendChild(stats.dom)
 
-  const app = new PIXI.Application()
+  const app = new PIXI.Application({
+    backgroundColor: 0x199811
+  })
   document.body.appendChild(app.view)
   app.loader.add('trash', TempImg).load((loader, resources) => {
     const tempObject = new PIXI.Sprite(resources.trash.texture)
@@ -44,6 +46,7 @@ export const pixelRun = () => {
 
   resize()
 
+  /* controls */
   document.addEventListener('keydown', (e) => {
     if (e.keyCode === 37) { // left
       left = true

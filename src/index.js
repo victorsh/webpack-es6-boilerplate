@@ -2,6 +2,7 @@ import join from 'lodash/join'
 import './css/index.scss'
 import * as Test from './scripts/test'
 import * as PIXISTART from './scripts/pixi-starter'
+import * as BABYLONSTART from './scripts/babylon-starter'
 
 const _ = { join }
 
@@ -15,15 +16,17 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-function component () {
-  const element = document.createElement('div')
-  element.innerHTML = _.join(['hello', 'webpack'], ' ')
+// function component () {
+//   const element = document.createElement('div')
+//   element.innerHTML = _.join(['hello', 'webpack'], ' ')
 
-  return element
-}
+//   return element
+// }
 
-Test.test()
+// Test.test()
 
-document.body.appendChild(component())
+// document.body.appendChild(component())
 
-PIXISTART.pixelRun()
+// PIXISTART.pixelRun()
+
+BABYLONSTART.babylonRunner()
