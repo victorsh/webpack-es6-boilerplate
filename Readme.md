@@ -23,3 +23,6 @@ A boilerplate for building Single Page Applications
 - [ ] Add support for capacitor
 - [ ] Further optimize webpack production build
 - [ ] Add Unit Tests
+
+####
+- https://developer.mozilla.org/en-US/docs/Games/Techniques
