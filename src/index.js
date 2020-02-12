@@ -23,10 +23,10 @@ if ('serviceWorker' in navigator) {
 //   return element
 // }
 
-// Test.test()
+Test.test()
 
 // document.body.appendChild(component())
 
 // PIXISTART.pixelRun()
 
-BABYLONSTART.babylonRunner()
+// BABYLONSTART.babylonRunner()
