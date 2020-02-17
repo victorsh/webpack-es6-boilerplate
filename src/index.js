@@ -1,7 +1,8 @@
 import './css/index.scss'
 // import * as Test from './scripts/test'
-import * as PIXISTART from './scripts/pixi-starter'
+// import * as PIXISTART from './scripts/pixi-starter'
 // import * as BABYLONSTART from './scripts/babylon-starter'
+import * as tfex from './scripts/tfex'
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -24,6 +25,8 @@ if ('serviceWorker' in navigator) {
 
 // document.body.appendChild(component())
 
-PIXISTART.pixelRun()
+// PIXISTART.pixelRun()
 
 // BABYLONSTART.babylonRunner()
+
+tfex.runTF()

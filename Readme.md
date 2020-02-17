@@ -3,6 +3,7 @@
 A boilerplate for building Single Page Applications
 
 # Installation
+- `brew install nss`
 - `npm i`
 - `npm run nodedev`: Run node development server with backend
 - `npm run webpackdev`: Run webpack development server with backend
