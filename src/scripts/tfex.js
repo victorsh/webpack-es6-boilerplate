@@ -24,6 +24,14 @@ const run = async () => {
 
   const model = createModel()
   tfvis.show.modelSummary({ name: 'Model Summary' }, model)
+
+  // Convert the data to a form we can use for training.
+  const tensorData = convertToTensor(data)
+  const { inputs, labels } = tensorData
+
+  // Train the model
+  await trainModel(model, inputs, labels)
+  console.log('Done Training')
 }
 
 const getData = async () => {
@@ -71,5 +79,33 @@ const convertToTensor = data => {
       labelMax,
       labelMin
     }
+  })
+}
+
+const trainModel = async (model, inputs, labels) => {
+  // Prepare the model for training
+  model.compile({
+    // Algorithm that governs the updates to the model as it sees examples. Using Adam Optimizer - effective in practice and requires no configuration
+    optimizer: tf.train.adam(),
+    // Function that tells the model how well it's doing on learning each of the batches (data subsets) that are shown. meanSquaredError - Compares predictions made by the model with the true values.
+    loss: tf.losses.meanSquaredError,
+    metrics: ['mse']
+  })
+
+  // Refers to the size of the data subsets that the model will see on each iteration of the training. Common sizes range 32-512.
+  // Selecting a batch size is complicated and requires understanding the underlying maths.
+  const batchSize = 32
+  // Number of times to look at the entire dataset. In this case it will loop over all the data 50 times.
+  const epochs = 50
+
+  return model.fit(inputs, labels, {
+    batchSize,
+    epochs,
+    shuffle: true,
+    callbacks: tfvis.show.fitCallbacks(
+      { name: 'Training Performance' },
+      ['loss', 'mse'],
+      { height: 200, callbacks: ['onEpochEnd'] }
+    )
   })
 }
