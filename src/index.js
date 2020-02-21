@@ -2,7 +2,8 @@ import './css/index.scss'
 // import * as Test from './scripts/test'
 // import * as PIXISTART from './scripts/pixi-starter'
 // import * as BABYLONSTART from './scripts/babylon-starter'
-import * as tfex from './scripts/tfex'
+// import * as tfex from './scripts/tfex'
+import Three2d from './scripts/Three2d'
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -29,4 +30,5 @@ if ('serviceWorker' in navigator) {
 
 // BABYLONSTART.babylonRunner()
 
-tfex.runTF()
+// tfex.runTF()
+let t2d = new Three2d()

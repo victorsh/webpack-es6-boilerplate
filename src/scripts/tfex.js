@@ -3,6 +3,8 @@ import * as tfvis from '@tensorflow/tfjs-vis'
 
 /**
  * An example of training and predicting using a neural net and tensorflow.
+ *
+ * Example of Linear Regression: Tries to fit a line to trend present in the input data
  */
 export const runTF = async () => {
   document.addEventListener('DOMContentLoaded', run)
@@ -40,6 +42,8 @@ const run = async () => {
   // Train the model
   await trainModel(model, inputs, labels)
   console.log('Done Training')
+
+  testModel(model, data, tensorData)
 }
 
 /* ----> SUB FUNCTIONS <---- */
@@ -61,6 +65,7 @@ const createModel = () => {
   // Add an output layer
   // Units: is 1 because we only want to output one number.
   model.add(tf.layers.dense({ units: 1, useBias: true }))
+  model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }))
 
   return model
 }
@@ -118,7 +123,7 @@ const trainModel = async (model, inputs, labels) => {
   // Selecting a batch size is complicated and requires understanding the underlying maths.
   const batchSize = 32
   // Number of times to look at the entire dataset. In this case it will loop over all the data 50 times.
-  const epochs = 50
+  const epochs = 200
 
   // model.fit starts the training loop. Monitoring training process through tfvis
   return model.fit(inputs, labels, {
@@ -140,7 +145,7 @@ const testModel = (model, inputData, normalizationData) => {
   // We un-normalize the data by doing the inverse of the min-max scaling
   // that we did earlier.
   const [xs, preds] = tf.tidy(() => {
-    const xs = tf.linespace(0, 1, 100)
+    const xs = tf.linspace(0, 1, 100)
     const preds = model.predict(xs.reshape([100, 1]))
 
     const unNormXs = xs.mul(inputMax.sub(inputMin)).add(labelMin)
@@ -151,8 +156,22 @@ const testModel = (model, inputData, normalizationData) => {
   })
 
   const predictedPoints = Array.from(xs).map((val, i) => {
-    return { x: val, y}
+    return { x: val, y: preds[i] }
   })
+
+  const originalPoints = inputData.map(d => ({
+    x: d.horsepower, y: d.mpg
+  }))
+
+  tfvis.render.scatterplot(
+    { name: 'Model Predictions vs Original Data' },
+    { values: [originalPoints, predictedPoints], series: ['original', 'predicted'] },
+    {
+      xLabel: 'Horsepower',
+      yLabel: 'MPG',
+      height: 300
+    }
+  )
 }
 
 /* ----> Data Collection <---- */
