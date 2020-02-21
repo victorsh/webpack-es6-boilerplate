@@ -20,10 +20,15 @@ A boilerplate for building Single Page Applications
 - PixiJS
 - Sample Backend Server
 
-#### ToDo
+#### TODO
 - [ ] Add support for capacitor
 - [ ] Further optimize webpack production build
 - [ ] Add Unit Tests
 
 ####
 - https://developer.mozilla.org/en-US/docs/Games/Techniques
+
+# Going Beyond
+
+#### Neural Nets
+- https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=2&t=0s

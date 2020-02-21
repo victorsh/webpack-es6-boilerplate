@@ -1,20 +1,28 @@
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
+/**
+ * An example of training and predicting using a neural net and tensorflow.
+ */
 export const runTF = async () => {
   document.addEventListener('DOMContentLoaded', run)
 }
 
+// Main function
 const run = async () => {
   const data = await getData()
+  // Organize the data by mapping it to x and y parameters
   const values = data.map(d => ({
     x: d.horsepower,
     y: d.mpg
   }))
 
   tfvis.render.scatterplot(
+    // Title
     { name: 'Horsepower v MPG' },
+    // Data
     { values },
+    // Graph Parameters
     {
       xLabel: 'Horsepower',
       yLabel: 'MPG',
@@ -34,26 +42,40 @@ const run = async () => {
   console.log('Done Training')
 }
 
-const getData = async () => {
-  const carsDataReq = await fetch('https://storage.googleapis.com/tfjs-tutorials/carsData.json')
-  const carsData = await carsDataReq.json()
-  const cleaned = carsData.map(car => ({
-    mpg: car.Miles_per_Gallon,
-    horsepower: car.Horsepower
-  })).filter(car => (car.mpg != null && car.horsepower != null))
+/* ----> SUB FUNCTIONS <---- */
 
-  return cleaned
-}
-
+// Create the neural network
+// This one only has one hidden layer
+// Note: bias is automatically set
+//
+// Units corresponds to feature vectors. Here there is only one feature vector which is Horsepower.
 const createModel = () => {
+  // Sequential becuase its inputs flow straight down to its output
+  // NOTE: Other types of models can have branches, or even multiple inputs and outputs
   const model = tf.sequential()
+  // Add a single hidden layer
+  // A Dense Layer: is basically: Sigmoid(w1a1 + w2a2 + ... + wnan + bias)
+  // Input Shape: is [1] because we only have 1 number as our input which is the horsepower
+  // Units: sets how big the weight matrix will be in the layer. By setting it to 1 here we are saying there will be 1 weight for each of the inputs features of the data
   model.add(tf.layers.dense({ inputShape: [1], units: 1, useBias: true }))
+  // Add an output layer
+  // Units: is 1 because we only want to output one number.
   model.add(tf.layers.dense({ units: 1, useBias: true }))
 
   return model
 }
 
+/**
+ * Convert the input data to tensors that we can use for machine
+ * learning. We will also do the important best practices of _shuffling_
+ * the data and _normalizing_ the data
+ * MPG on the y-axis.
+ */
 const convertToTensor = data => {
+  // Wrapping these calculations in a tidy will dispose any
+  // intermediate tensors.
+
+  // What are intermediat tensors?
   return tf.tidy(() => {
     tf.util.shuffle(data)
 
@@ -98,14 +120,53 @@ const trainModel = async (model, inputs, labels) => {
   // Number of times to look at the entire dataset. In this case it will loop over all the data 50 times.
   const epochs = 50
 
+  // model.fit starts the training loop. Monitoring training process through tfvis
   return model.fit(inputs, labels, {
     batchSize,
     epochs,
     shuffle: true,
     callbacks: tfvis.show.fitCallbacks(
       { name: 'Training Performance' },
-      ['loss', 'mse'],
+      ['loss', 'mse'], // mse = mean squared error
       { height: 200, callbacks: ['onEpochEnd'] }
     )
   })
+}
+
+const testModel = (model, inputData, normalizationData) => {
+  const { inputMax, inputMin, labelMin, labelMax } = normalizationData
+
+  // Generate predictions for a uniform range of numbers between 0 and 1;
+  // We un-normalize the data by doing the inverse of the min-max scaling
+  // that we did earlier.
+  const [xs, preds] = tf.tidy(() => {
+    const xs = tf.linespace(0, 1, 100)
+    const preds = model.predict(xs.reshape([100, 1]))
+
+    const unNormXs = xs.mul(inputMax.sub(inputMin)).add(labelMin)
+    const unNormPreds = preds.mul(labelMax.sub(labelMin)).add(labelMin)
+
+    // Un-normalize the data
+    return [unNormXs.dataSync(), unNormPreds.dataSync()]
+  })
+
+  const predictedPoints = Array.from(xs).map((val, i) => {
+    return { x: val, y}
+  })
+}
+
+/* ----> Data Collection <---- */
+
+// Get the sample data from Google, Clean it up and return it.
+const getData = async () => {
+  const carsDataReq = await fetch('https://storage.googleapis.com/tfjs-tutorials/carsData.json')
+  const carsData = await carsDataReq.json()
+  // Creates new data object that only picks out the miles per gallon and horsepower parameters
+  // A filter is set to not include any data that is null
+  const cleaned = carsData.map(car => ({
+    mpg: car.Miles_per_Gallon,
+    horsepower: car.Horsepower
+  })).filter(car => (car.mpg != null && car.horsepower != null))
+
+  return cleaned
 }
