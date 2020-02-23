@@ -54,8 +54,10 @@
     "axios": "^0.19.2",
     "babylonjs": "^4.0.3",
     "cors": "^2.8.5",
+    "load-bmfont": "^1.4.0",
     "lodash": "^4.17.15",
     "pixi.js": "^5.2.1",
-    "three": "^0.113.2"
+    "three": "^0.113.2",
+    "three-bmfont-text": "^2.3.0"
   }
 }

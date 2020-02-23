@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WorkboxPlugin = require('workbox-webpack-plugin')
@@ -13,6 +14,9 @@ module.exports = {
     new WorkboxPlugin.InjectManifest({
       swSrc: path.resolve(__dirname, '../src/src-sw.js'),
       swDest: 'sw.js'
+    }),
+    new webpack.ProvidePlugin({
+      THREE: 'three'
     })
   ],
   output: {
@@ -27,7 +31,7 @@ module.exports = {
       ]
     },
     {
-      test: /\.(woff|woff2|eot|ttf|otf)$/,
+      test: /\.(woff|woff2|eot|ttf|otf|fnt)$/,
       use: [
         'file-loader'
       ]

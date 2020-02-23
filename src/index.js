@@ -31,4 +31,5 @@ if ('serviceWorker' in navigator) {
 // BABYLONSTART.babylonRunner()
 
 // tfex.runTF()
-let t2d = new Three2d()
+// let t2d = new Three2d()
+document.addEventListener('DOMContentLoaded', new Three2d())
