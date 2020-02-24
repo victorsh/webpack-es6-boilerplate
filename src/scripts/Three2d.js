@@ -9,6 +9,9 @@ import CaviarDreamFont from '../bmt-fonts/CaviarDreams_Regular.json'
 // https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
 // https://codepen.io/Jobarbo/pen/zZMwVm?editors=1010
 
+const COLOR_BACKGROUND = 0xE0E0E0
+const COLOR_PLAYER = 0x33F333
+
 export default class Three2D {
   constructor () {
     this.init()
@@ -31,7 +34,7 @@ export default class Three2D {
     this.mouse = new THREE.Vector2()
 
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(0xE0E0E0)
+    this.scene.background = new THREE.Color(COLOR_BACKGROUND)
 
     // Camera Setup
     this.setupCamera()
@@ -66,7 +69,7 @@ export default class Three2D {
   }
 
   setupCamera () {
-    this.frustumSize = 10
+    this.frustumSize = 20
     this.aspect = window.innerWidth / window.innerHeight
     this.dis = 2
     this.camera = new THREE.OrthographicCamera
@@ -97,27 +100,31 @@ export default class Three2D {
   }
 
   setupLights () {
-    this.lightAmbient = new THREE.AmbientLight(0xFFAFFA)
+    this.lightAmbient = new THREE.AmbientLight(0xFFAFFA, 0.8)
     this.scene.add(this.lightAmbient)
 
-    this.lightDirectional = new THREE.DirectionalLight(0xffffff, 1)
+    this.lightDirectional = new THREE.DirectionalLight(0xffffff, 0.7)
     this.lightDirectional.position.set(1, 1, 1).normalize()
 		this.scene.add(this.lightDirectional)
   }
 
   setupObjects() {
-    this.cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial({ color: 0xff0000 }))
+    this.cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial({ color: COLOR_PLAYER }))
     this.cube.position.y = -1
     this.scene.add(this.cube)
 
-    let circle = new THREE.Mesh(new THREE.CircleGeometry(1, 36), new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide }))
+    let circle = new THREE.Mesh(new THREE.CircleGeometry(1, 36), new THREE.MeshBasicMaterial({ color: COLOR_PLAYER, side: THREE.DoubleSide }))
     circle.name = 'player'
     circle.position.x = -2
     this.scene.add(circle)
 
-    let plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide }))
+    let plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.7 }))
     plane.position.y = 3
     this.scene.add(plane)
+
+    let plane2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000a2, side: THREE.DoubleSide, opacity: 1 }))
+    plane2.position.set(1, 3, -1)
+    this.scene.add(plane2)
   }
 
   setupCameraControls() {

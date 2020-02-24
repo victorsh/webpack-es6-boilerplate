@@ -15,9 +15,9 @@ module.exports = {
       swSrc: path.resolve(__dirname, '../src/src-sw.js'),
       swDest: 'sw.js'
     }),
-    new webpack.ProvidePlugin({
-      THREE: 'three'
-    })
+    // new webpack.ProvidePlugin({
+    //   THREE: 'three'
+    // })
   ],
   output: {
     filename: 'main.js',
