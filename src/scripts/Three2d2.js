@@ -70,35 +70,40 @@ export default class Three2D {
   }
 
   setupFont () {
-    this.fontLoader = new THREE.FontLoader()
-    let self = this
-
     let fonter = new THREE.Font(CaviarDreamFont)
-    let matMesh = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
+    let matMesh = new THREE.MeshLambertMaterial({ color: 0x000000, side: THREE.DoubleSide})
     let shapes = fonter.generateShapes('hello world!', 1)
     let geom = new THREE.ShapeBufferGeometry(shapes)
     geom.computeBoundingBox()
 
     let text = new THREE.Mesh(geom, matMesh)
     text.position.set(0, 3, 0)
-    self.scene.add(text)
+    this.scene.add(text)
   }
 
   setupObjects() {
-    let playerGeom = new THREE.CircleGeometry(0.01, 36)
+    let playerGeom = new THREE.CircleGeometry(0.1, 36)
     let playerMat = new THREE.MeshBasicMaterial({ color: COLOR_PLAYER, side: THREE.DoubleSide })
-    let circle = new THREE.Mesh(playerGeom, playerMat)
-    circle.name = 'player'
-    circle.position.set(0, 0, 0)
-    circle.castShadow = true
-    this.scene.add(circle)
+    let playerCircle = new THREE.Mesh(playerGeom, playerMat)
+    playerCircle.name = 'player'
+    playerCircle.position.set(0, 0, 0)
+    playerCircle.castShadow = true
+    this.scene.add(playerCircle)
+
+    let enemyGeom = new THREE.CircleGeometry(0.1, 36)
+    let enemyMat = new THREE.MeshBasicMaterial({ color: 0xF38888, side: THREE.DoubleSide })
+    let enemyCircle = new THREE.Mesh(enemyGeom, enemyMat)
+    enemyCircle.name = 'enemy'
+    enemyCircle.position.set(0, -1, 0)
+    enemyCircle.castShadow = true
+    this.scene.add(enemyCircle)
 
     let objGeom = new THREE.PlaneGeometry(1, 2)
     objGeom.computeBoundingBox()
     let objMesh = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide })
     let plane = new THREE.Mesh(objGeom, objMesh)
     plane.name = 'obstacle'
-    plane.position.set(0, 3, 0)
+    plane.position.set(-1, 0, 0)
     this.scene.add(plane)
 
     let backgroundGeom = new THREE.PlaneGeometry(50, 50)
@@ -139,7 +144,7 @@ export default class Three2D {
   }
 
   setupCamera () {
-    this.frustumSize = 1
+    this.frustumSize = 10
     this.aspect = window.innerWidth / window.innerHeight
     this.dis = 2
     this.camera = new THREE.OrthographicCamera
@@ -158,7 +163,7 @@ export default class Three2D {
     this.scene.add(this.lightAmbient)
 
     this.lightDirectional = new THREE.DirectionalLight(0xffffff, 0.7)
-    this.lightDirectional.position.set(1, 1, 1).normalize()
+    this.lightDirectional.position.set(1, 0, 1).normalize()
     this.lightDirectional.castShadow = true
 		this.scene.add(this.lightDirectional)
   }
