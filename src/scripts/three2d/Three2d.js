@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import Stats from 'stats-js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
-import CaviarDreamFont from '../bmt-fonts/CaviarDreams_Regular.json'
+import CaviarDreamFont from '../fonts/CaviarDreams_Regular.json'
 
 ////// https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_cubes_ortho.html
 // https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
@@ -11,6 +11,8 @@ import CaviarDreamFont from '../bmt-fonts/CaviarDreams_Regular.json'
 
 const COLOR_BACKGROUND = 0xE0E0E0
 const COLOR_PLAYER = 0x33F333
+const COLOR_BLACK = 0x000000
+const COLOR_WHITE = 0xFFFFFF
 
 export default class Three2D {
   constructor () {
@@ -20,7 +22,7 @@ export default class Three2D {
   init () {
     this.pause = false
 
-    this.playerSpeed = 100
+    this.playerSpeed = 1000
     this.playerUp = false
     this.playerDown = false
     this.playerLeft = false
@@ -43,12 +45,8 @@ export default class Three2D {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
 
     document.body.appendChild(this.renderer.domElement)
-
-    this.stats = new Stats()
-    this.stats.dom.style.width = 'auto';
-    this.stats.dom.style.height = 'auto';
-    document.body.appendChild(this.stats.dom)
     
+    this.setupStats()
     this.setupCameraControls()
     this.setupEvents()
     this.setupScene()
@@ -88,7 +86,7 @@ export default class Three2D {
     let self = this
 
     let fonter = new THREE.Font(CaviarDreamFont)
-    let matMesh = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
+    let matMesh = new THREE.MeshBasicMaterial({ color: COLOR_BLACK, side: THREE.DoubleSide})
     let shapes = fonter.generateShapes('hello world!', 1)
     let geom = new THREE.ShapeBufferGeometry(shapes)
     geom.computeBoundingBox()
@@ -103,7 +101,7 @@ export default class Three2D {
     this.lightAmbient = new THREE.AmbientLight(0xFFAFFA, 0.8)
     this.scene.add(this.lightAmbient)
 
-    this.lightDirectional = new THREE.DirectionalLight(0xffffff, 0.7)
+    this.lightDirectional = new THREE.DirectionalLight(COLOR_WHITE, 0.7)
     this.lightDirectional.position.set(1, 1, 1).normalize()
 		this.scene.add(this.lightDirectional)
   }
@@ -118,11 +116,11 @@ export default class Three2D {
     circle.position.x = -2
     this.scene.add(circle)
 
-    let plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.7 }))
+    let plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide }))
     plane.position.y = 3
     this.scene.add(plane)
 
-    let plane2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000a2, side: THREE.DoubleSide, opacity: 1 }))
+    let plane2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000a2, side: THREE.DoubleSide }))
     plane2.position.set(1, 3, -1)
     this.scene.add(plane2)
   }
@@ -138,6 +136,13 @@ export default class Three2D {
     this.tControls = new TransformControls(this.camera, this.renderer.domElement, this.oControls)
     this.tControls.setMode('translate')
     this.scene.add(this.tControls)
+  }
+
+  setupStats () {
+    this.stats = new Stats()
+    this.stats.dom.style.width = 'auto';
+    this.stats.dom.style.height = 'auto';
+    document.body.appendChild(this.stats.dom)
   }
 
   animate () {
@@ -164,6 +169,8 @@ export default class Three2D {
       // } else {
       //   this.INTERSECTED = null
       // }
+
+      console.log(player.position, enemy.position, obstacle.position)
   
       this.renderer.render(this.scene, this.camera)
 

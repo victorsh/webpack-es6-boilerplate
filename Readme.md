@@ -23,6 +23,7 @@ A boilerplate for building Single Page Applications
 - Progressive Web App
 - PixiJS
 - Sample Backend Server
+- Three2d
 
 #### TODO
 - [ ] Add support for capacitor
@@ -39,3 +40,6 @@ A boilerplate for building Single Page Applications
 
 - Bitmap font generator: https://github.com/soimy/msdf-bmfont-xml/
 - Three Bitmap Fonts: https://tympanus.net/codrops/2019/10/10/create-text-in-three-js-with-three-bmfont-text/
+
+# Other
+- Unlock Chrome Framerate: `open -a "Google Chrome" --args --disable-gpu-vsync`

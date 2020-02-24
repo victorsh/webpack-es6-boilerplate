@@ -9,15 +9,15 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Production'
+      template: './src/index.html'
     }),
     new WorkboxPlugin.InjectManifest({
       swSrc: path.resolve(__dirname, '../src/src-sw.js'),
       swDest: 'sw.js'
     }),
-    // new webpack.ProvidePlugin({
-    //   THREE: 'three'
-    // })
+    new webpack.ProvidePlugin({
+      THREE: 'three'
+    })
   ],
   output: {
     filename: 'main.js',
