@@ -14,6 +14,8 @@ import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
 
 import CaviarDreamFont from '../../fonts/CaviarDreams_Regular.json'
 
+import { setupObjects } from './SceneObjects'
+
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_cubes_ortho.html
 // https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
 // https://codepen.io/Jobarbo/pen/zZMwVm?editors=1010
@@ -21,7 +23,7 @@ import CaviarDreamFont from '../../fonts/CaviarDreams_Regular.json'
 // https://gero3.github.io/facetype.js/
 // https://discoverthreejs.com/tips-and-tricks/
 
-const COLOR_BACKGROUND = 0xE0E0E0
+const COLOR_BACKGROUND = 0xA4F4C1
 const COLOR_PLAYER = 0x33F333
 const COLOR_WHITE = 0xFFFFFF
 const COLOR_BLACK = 0x000000
@@ -43,6 +45,7 @@ export default class Three2D {
     this.playerDown = false
     this.playerLeft = false
     this.playerRight = false
+    this.playerMovePause = false
 
     this.clock = new THREE.Clock()
 
@@ -50,10 +53,10 @@ export default class Three2D {
     this.mouse = new THREE.Vector2()
 
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(COLOR_BACKGROUND)
+    this.scene.background = new THREE.Color(COLOR_BLACK)
 
     // Camera Setup
-    this.frustumSize = 10
+    this.frustumSize = 15
     this.aspect = window.innerWidth / window.innerHeight
     this.dis = 2
     this.camera = new THREE.OrthographicCamera
@@ -70,15 +73,12 @@ export default class Three2D {
     this.renderer = new THREE.WebGLRenderer()
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
-    this.renderer.shadowMap = true
-    this.renderer.gammaFactor = 2.2
-    this.renderer.gammaOutput = true
     this.renderer.autoClear = false
     let pixelRatio = this.renderer.getPixelRatio()
     document.body.appendChild(this.renderer.domElement)
 
     // Setup Shaders
-    this.selectedShader = 'smaa'
+    this.selectedShader = 'fxaa'
     this.effectComposer = new EffectComposer(this.renderer)
     this.renderPass = new RenderPass(this.scene, this.camera)
     this.effectComposer.addPass(this.renderPass)
@@ -86,8 +86,8 @@ export default class Three2D {
     if (this.selectedShader === 'fxaa') {
       // FXAA
       this.fxaaPass = new ShaderPass(FXAAShader)
-      this.fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
-      this.fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+      this.fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio)
+      this.fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio)
       this.effectComposer.addPass(this.fxaaPass)
     } else if (this.selectedShader === 'smaa') {
       // SMAA
@@ -96,70 +96,14 @@ export default class Three2D {
     }
 
     this.stats = new Stats()
-    this.stats.dom.style.width = 'auto';
-    this.stats.dom.style.height = 'auto';
+    this.stats.dom.style.width = 'auto'
+    this.stats.dom.style.height = 'auto'
     document.body.appendChild(this.stats.dom)
     
     this.setupCameraControls()
     this.setupEvents()
-    this.setupObjects()
+    setupObjects(this.scene)
     this.animate()
-    console.log(this.scene)
-  }
-
-  setupObjects() {
-    // Lights
-    // this.lightAmbient = new THREE.AmbientLight(0xFFAFFA, 0.8)
-    // this.scene.add(this.lightAmbient)
-    this.lightDirectional = new THREE.DirectionalLight(0xffffff, 0.7)
-    this.lightDirectional.position.set(1, 0, 1).normalize()
-    this.lightDirectional.castShadow = true
-    this.scene.add(this.lightDirectional)
-    
-    // Font
-    let fonter = new THREE.Font(CaviarDreamFont)
-    let matMesh = new THREE.MeshBasicMaterial({ color: COLOR_BLACK, side: THREE.DoubleSide})
-    let shapes = fonter.generateShapes('hello world!', 1)
-    let geom = new THREE.ShapeBufferGeometry(shapes)
-    geom.computeBoundingBox()
-    let text = new THREE.Mesh(geom, matMesh)
-    text.position.set(0, 3, 0)
-    this.scene.add(text)
-
-    // Objects
-    let playerGeom = new THREE.CircleBufferGeometry(0.1, 36)
-    let playerMat = new THREE.MeshBasicMaterial({ color: COLOR_PLAYER, side: THREE.DoubleSide })
-    let playerCircle = new THREE.Mesh(playerGeom, playerMat)
-    playerCircle.name = 'player'
-    playerCircle.position.set(0, 0, 0)
-    playerCircle.castShadow = true
-    this.scene.add(playerCircle)
-
-    let enemyGeom = new THREE.CircleBufferGeometry(0.1, 36)
-    let enemyMat = new THREE.MeshBasicMaterial({ color: 0xF38888, side: THREE.DoubleSide })
-    let enemyCircle = new THREE.Mesh(enemyGeom, enemyMat)
-    enemyCircle.name = 'enemy'
-    enemyCircle.position.set(0, -1, 0)
-    enemyCircle.castShadow = true
-    this.scene.add(enemyCircle)
-
-    let objGeom = new THREE.PlaneBufferGeometry(1, 2)
-    objGeom.computeBoundingBox()
-    let objMesh = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide })
-    let plane = new THREE.Mesh(objGeom, objMesh)
-    plane.name = 'obstacle'
-    plane.position.set(-1, 0, 0)
-    // plane.matrixAutoUpdate = false
-    this.scene.add(plane)
-
-    let backgroundGeom = new THREE.PlaneBufferGeometry(50, 50)
-    let backgroundMat = new THREE.MeshBasicMaterial({ color: 0x337788, side: THREE.DoubleSide })
-    let background = new THREE.Mesh(backgroundGeom, backgroundMat)
-    background.name = 'background'
-    background.position.set(0, 0, -1)
-    background.receiveShadow = true
-    // background.matrixAutoUpdate = false
-    this.scene.add(background)
   }
 
   animate () {
@@ -168,20 +112,25 @@ export default class Three2D {
 
     let delta = this.clock.getDelta()
     requestAnimationFrame(this.animate.bind(this))
+
     this.playerMovement(delta)
 
     let player = this.scene.getObjectByName('player')
     let enemy = this.scene.getObjectByName('enemy')
     let obstacle = this.scene.getObjectByName('obstacle')
+
     if (this.circleCollision(player.position.x, player.position.y, player.geometry.parameters.radius, enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)) {
       console.log('circle-collision')
     }
 
-    if (this.crc(
+    if (this.circleRectangleCollision(
       player.position.x, player.position.y, player.geometry.parameters.radius,
       obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
     )) {
-      console.log('box-collision')
+      if(this.playerLeft === true) this.playerLeft = false
+      if(this.playerRight === true) this.playerRight = false
+      if(this.playerUp === true) this.playerUp = false
+      if(this.playerDown === true) this.playerDown = false
     }
 
     this.camera.updateWorldMatrix()
@@ -220,12 +169,12 @@ export default class Three2D {
   }
 
   setupCameraControls() {
-    this.oControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.oControls = new OrbitControls(this.camera, this.renderer.domElement)
     // this.oControls.enabled = true
     // this.oControls.enableRotate = true
     // this.oControls.enableZoom = true
     // this.oControls.zoomSpeed = 1
-    this.oControls.enablePan = false
+    this.oControls.enablePan = true
   
     this.tControls = new TransformControls(this.camera, this.renderer.domElement, this.oControls)
     this.tControls.setMode('translate')
@@ -243,8 +192,8 @@ export default class Three2D {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     let pixelRatio = this.renderer.getPixelRatio()
     if (this.selectedShader === 'fxaa') {
-      this.fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
-      this.fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+      this.fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio)
+      this.fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio)
     } else if (this.selectedShader === 'smaa') {
       this.effectComposer.setSize(window.innerWidth, window.innerHeight)
     }
@@ -280,7 +229,10 @@ export default class Three2D {
   handleMouseDown(event) {
     event.preventDefault()
     this.raycaster.setFromCamera(this.mouse, this.camera)
-    let intersects = this.raycaster.intersectObjects(this.scene.children)
+    let intersects = this.raycaster.intersectObjects(this.scene.children, true)
+    if (intersects[0].object.name === 'playButton') {
+      console.log('Play Button Pressed')
+    }
     console.log(intersects)
   }
 
@@ -330,31 +282,6 @@ export default class Three2D {
   }
 
   circleRectangleCollision(cx, cy, r, rx, ry, rw, rh) {
-    let testx = cx
-    let testy = cy
-
-    if (cx < rx) {
-      testx = rx
-    } else if (cx > rx + rw) {
-      testx = rx + rw
-    }
-    if (cy < ry) {
-      testy = ry
-    } else if (cy > ry + rh) {
-      testy = ry + rh
-    }
-
-    let distx = cx - testx
-    let disty = cy - testy
-    let distance = Math.sqrt(Math.pow(distx, 2) + Math.pow(disty, 2))
-
-    if (distance <= r) {
-      return true
-    }
-    return false
-  }
-
-  crc(cx, cy, r, rx, ry, rw, rh) {
     let circleDistanceX = Math.abs(cx - rx)
     let circleDistanceY = Math.abs(cy - ry)
 
