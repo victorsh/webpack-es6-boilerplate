@@ -124,11 +124,13 @@ export default class Three2D {
   handlePostStep () {
     let vx = this.playerSpeed * (this.playerRight - this.playerLeft)
     let vy = this.playerSpeed * (this.playerUp - this.playerDown)
+
     if (vx !== 0 && vy !== 0) {
       let vxy = Math.sqrt(vx*vx + vy*vy)
       vx = (this.playerRight - this.playerLeft) * vxy / 2
       vy = (this.playerUp - this.playerDown) * vxy / 2
     }
+    
     this.playerBody.velocity = [vx, vy]
   }
 
