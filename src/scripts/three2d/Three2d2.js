@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as THREE from 'three'
 import Stats from 'stats-js'
+import p2 from 'p2'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
@@ -9,24 +10,11 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass'
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader'
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
-
-import CaviarDreamFont from '../../fonts/CaviarDreams_Regular.json'
 
 import { setupObjects } from './SceneObjects'
 
-// https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_cubes_ortho.html
-// https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
-// https://codepen.io/Jobarbo/pen/zZMwVm?editors=1010
-// http://www.jeffreythompson.org/collision-detection/circle-rect.php
-// https://gero3.github.io/facetype.js/
-// https://discoverthreejs.com/tips-and-tricks/
-
-const COLOR_BACKGROUND = 0xA4F4C1
-const COLOR_PLAYER = 0x33F333
-const COLOR_WHITE = 0xFFFFFF
-const COLOR_BLACK = 0x000000
+import * as Colors from './Colors'
 
 export default class Three2D {
   constructor () {
@@ -37,14 +25,11 @@ export default class Three2D {
     this.pause = false
 
     this.startSpeed = 1
-    this.playerSpeedUp = this.startSpeed
-    this.playerSpeedDown = this.startSpeed
-    this.playerSpeedLeft = this.startSpeed
-    this.playerSpeedRight = this.startSpeed
-    this.playerUp = false
-    this.playerDown = false
-    this.playerLeft = false
-    this.playerRight = false
+    this.playerSpeed = 1
+    this.playerUp = 0
+    this.playerDown = 0
+    this.playerLeft = 0
+    this.playerRight = 0
     this.playerUpCollision = false
     this.playerDownCollision = false
     this.playerLeftCollision = false
@@ -57,7 +42,7 @@ export default class Three2D {
     this.mouse = new THREE.Vector2()
 
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(COLOR_BLACK)
+    this.scene.background = new THREE.Color(Colors.BLACK)
 
     // Camera Setup
     this.frustumSize = 15
@@ -107,122 +92,64 @@ export default class Three2D {
     this.setupCameraControls()
     this.setupEvents()
     setupObjects(this.scene)
+
+    // p2
+    this.world = new p2.World({
+      gravity: [0, 0]
+    })
+
+    this.playerBody = new p2.Body({
+      mass: 1,
+      fixedRotation: true,
+      position: [0, 0],
+      damping: 0.5
+    })
+    this.playerBody.addShape(new p2.Circle({ radius: 0.1 }))
+    this.world.addBody(this.playerBody)
+
+    this.enemyBody = new p2.Body({ position: [0, -1] })
+    this.enemyBody.addShape(new p2.Circle({ radius: 0.1}))
+    this.world.addBody(this.enemyBody)
+
+    this.obstacleBody = new p2.Body({ position: [2, 0]})
+    this.obstacleBody.addShape(new p2.Box({ width: 1, height: 2}))
+    this.world.addBody(this.obstacleBody)
+
+    this.world.on('postStep', this.handlePostStep.bind(this))
+
+    // Run
     this.animate()
+  }
+
+  handlePostStep () {
+    let vx = this.playerSpeed * (this.playerRight - this.playerLeft)
+    let vy = this.playerSpeed * (this.playerUp - this.playerDown)
+    if (vx !== 0 && vy !== 0) {
+      let vxy = Math.sqrt(vx*vx + vy*vy)
+      vx = (this.playerRight - this.playerLeft) * vxy / 2
+      vy = (this.playerUp - this.playerDown) * vxy / 2
+    }
+    this.playerBody.velocity = [vx, vy]
   }
 
   animate () {
     this.stats.begin()
     ///
-
-    let delta = this.clock.getDelta()
     requestAnimationFrame(this.animate.bind(this))
 
-    this.playerMovement(delta)
+    let delta = this.clock.getDelta()
 
-    let player = this.scene.getObjectByName('player')
-    let enemy = this.scene.getObjectByName('enemy')
-    let obstacle = this.scene.getObjectByName('obstacle')
-
-    // if (this.circleCollision(player.position.x, player.position.y, player.geometry.parameters.radius, enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)) {
-    //   console.log('circle-collision')
-    // }
-
-    // if (this.circleRectangleCollision(
-    //   player.position.x, player.position.y, player.geometry.parameters.radius,
-    //   obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-    // )) {
-
-    // }
+    // this.playerMovement(delta)
+    this.world.step(1/60, delta, 5)
+    this.scene.getObjectByName('player').position.set(this.playerBody.position[0], this.playerBody.position[1], 0)
 
     this.camera.updateWorldMatrix()
-  
-    this.raycaster.setFromCamera(this.mouse, this.camera)
-    let intersects = this.raycaster.intersectObjects(this.scene.children)
-
-    // if (intersects > 0) {
-    //   if (this.INTERSECTED != intersects[0].object) {
-    //     //
-    //   }
-    // } else {
-    //   this.INTERSECTED = null
-    // }
 
     // this.renderer.render(this.scene, this.camera)
     this.effectComposer.render()
 
     ///
     this.stats.end()
-  }
-
-  playerMovement(delta) {
-    let player = this.scene.getObjectByName('player')
-    let enemy = this.scene.getObjectByName('enemy')
-    let obstacle = this.scene.getObjectByName('obstacle')
-
-    if(this.playerUp) {
-      let nextMove = this.scene.getObjectByName('player').position.y + this.playerSpeedUp * delta
-
-      if (this.circleCollision(
-        player.position.x, nextMove, player.geometry.parameters.radius,
-        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
-      ) {
-        // this.scene.getObjectByName('player').position.y = enemy.position.y - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
-      } else if (this.circleRectangleCollision(
-        player.position.x, nextMove, player.geometry.parameters.radius,
-        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-      )) {
-        // this.scene.getObjectByName('player').position.y = obstacle.position.y - obstacle.geometry.parameters.height/2
-      }
-      else this.scene.getObjectByName('player').position.y = nextMove
-    }
-    if(this.playerDown) {
-      let nextMove = this.scene.getObjectByName('player').position.y - this.playerSpeedDown * delta
-
-      if (this.circleCollision(
-        player.position.x, nextMove, player.geometry.parameters.radius,
-        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
-      ) {
-        // this.scene.getObjectByName('player').position.y = enemy.position.y + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
-      } else if (this.circleRectangleCollision(
-        player.position.x, nextMove, player.geometry.parameters.radius,
-        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-      )) {
-        this.scene.getObjectByName('player').position.y = obstacle.position.y + obstacle.geometry.parameters.height/2
-      }
-      else this.scene.getObjectByName('player').position.y = nextMove
-    }
-    if(this.playerLeft) {
-      let nextMove = this.scene.getObjectByName('player').position.x - this.playerSpeedLeft * delta
-
-      if (this.circleCollision(
-        nextMove, player.position.y, player.geometry.parameters.radius,
-        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
-      )) {
-        // this.scene.getObjectByName('player').position.x = enemy.position.x + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
-      } else if (this.circleRectangleCollision(
-        nextMove, player.position.y, player.geometry.parameters.radius,
-        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-      )) {
-        // this.scene.getObjectByName('player').position.x = obstacle.position.x + obstacle.geometry.parameters.width/2
-      }
-      else this.scene.getObjectByName('player').position.x = nextMove
-    }
-    if(this.playerRight) {
-      let nextMove = this.scene.getObjectByName('player').position.x + this.playerSpeedRight * delta
-
-      if (this.circleCollision(
-        nextMove, player.position.y, player.geometry.parameters.radius,
-        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
-      )) {
-        // this.scene.getObjectByName('player').position.x = enemy.position.x - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
-      } else if (this.circleRectangleCollision(
-        nextMove, player.position.y, player.geometry.parameters.radius,
-        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-      )) {
-        // this.scene.getObjectByName('player').position.x = obstacle.position.x - obstacle.geometry.parameters.width/2
-      }
-      else this.scene.getObjectByName('player').position.x = nextMove
-    }
   }
 
   setupCameraControls() {
@@ -262,6 +189,7 @@ export default class Three2D {
     window.addEventListener('resize', this.onWindowResize.bind(this), false)
     document.addEventListener('mousemove', this.handleMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.handleMouseDown.bind(this), false)
+    document.addEventListener('mouseup', this.handleMouseUp.bind(this), false)
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
     document.addEventListener('keyup', this.handleKeyUp.bind(this), false)
   }
@@ -270,85 +198,79 @@ export default class Three2D {
     window.removeEventListener('resize', this.onWindowResize.bind(this), false)
     document.removeEventListener('mousemove', this.handleMouseMove.bind(this), false)
     document.removeEventListener('mousedown', this.handleMouseDown.bind(this), false)
+    document.removeEventListener('mouseup', this.handleMouseUp.bind(this), false)
     document.removeEventListener('keydown', this.handleKeyDown.bind(this), false)
     document.removeEventListener('keyup', this.handleKeyUp.bind(this), false)
   }
 
   /* EVENT INPUTS */
 
-  handleMouseMove(event) {
+  handleMouseMove (event) {
     event.preventDefault()
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
     // console.log(this.mouse.x, this.mouse.y)
+
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+    let intersects = this.raycaster.intersectObjects(this.scene.children, true)
+
+    if (intersects[0].object.name === 'playButton') {
+     this.scene.getObjectByName('playButton').material.color = new THREE.Color(0xFFAA11)
+      console.log('Play Button Hover')
+    } else {
+      this.scene.getObjectByName('playButton').material.color = new THREE.Color(Colors.MENU)
+    }
   }
 
-  handleMouseDown(event) {
+  handleMouseDown (event) {
     event.preventDefault()
     this.raycaster.setFromCamera(this.mouse, this.camera)
     let intersects = this.raycaster.intersectObjects(this.scene.children, true)
+
     if (intersects[0].object.name === 'playButton') {
+      this.playButtonPressed = true
       console.log('Play Button Pressed')
     }
+
     console.log(intersects)
+  }
+
+  handleMouseUp (event) {
+    event.preventDefault()
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+    let intersects = this.raycaster.intersectObjects(this.scene.children, true)
+
+    if (intersects[0].object.name === 'playButton' && this.playButtonPressed) {
+      this.playButtonPressed = false
+      console.log('Play Button Released')
+    }
   }
 
   handleKeyDown (event) {
     switch (event.code) {
-      case 'ArrowUp':
-        this.playerUp = true
+      case 'ArrowUp': this.playerUp = 1
         break
-      case 'ArrowDown':
-        this.playerDown = true
+      case 'ArrowDown': this.playerDown = 1
         break
-      case 'ArrowLeft':
-        this.playerLeft = true
+      case 'ArrowLeft': this.playerLeft = 1
         break
-      case 'ArrowRight':
-        this.playerRight = true
+      case 'ArrowRight': this.playerRight = 1
         break
-      case 'KeyP':
-        this.pause ? this.pause = false : this.pause = true
+      case 'KeyP': this.pause ? this.pause = false : this.pause = true
         break
     }
   }
 
   handleKeyUp (event) {
     switch (event.code) {
-      case 'ArrowUp':
-        this.playerUp = false
+      case 'ArrowUp': this.playerUp = 0
         break
-      case 'ArrowDown':
-        this.playerDown = false
+      case 'ArrowDown': this.playerDown = 0
         break
-      case 'ArrowLeft':
-        this.playerLeft = false
+      case 'ArrowLeft': this.playerLeft = 0
         break
-      case 'ArrowRight':
-        this.playerRight = false
+      case 'ArrowRight': this.playerRight = 0
         break
     }
-  }
-
-  circleCollision (x1, y1, r1, x2, y2, r2) {
-    return (Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2, 2)) < (r1+r2))
-  }
-  
-  rectagleCollision (x1, y1, x2, y2, w1, h1, w2, h2) {
-    return (x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2)
-  }
-
-  circleRectangleCollision (cx, cy, r, rx, ry, rw, rh) {
-    let circleDistanceX = Math.abs(cx - rx)
-    let circleDistanceY = Math.abs(cy - ry)
-
-    if (circleDistanceX > (rw/2 + r)) return false
-    if (circleDistanceY > (rh/2 + r)) return false
-
-    if (circleDistanceX <= (rw/2)) return true
-    if (circleDistanceY <= (rh/2)) return true
-
-    let cdsq = Math.pow(circleDistanceX - rw/2, 2) + Math.pow(circleDistanceY - rh/2, 2)
-    return (cdsq <= Math.pow(r, 2))
   }
 }

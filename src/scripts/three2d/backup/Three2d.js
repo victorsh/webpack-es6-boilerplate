@@ -204,6 +204,77 @@ export default class Three2D {
     // console.log(this.mouse.x, this.mouse.y)
   }
 
+  playerMovement(delta) {
+    let player = this.scene.getObjectByName('player')
+    let enemy = this.scene.getObjectByName('enemy')
+    let obstacle = this.scene.getObjectByName('obstacle')
+
+    if(this.playerUp === 1) {
+      let nextMove = this.scene.getObjectByName('player').position.y + this.playerSpeedUp * delta
+
+      if (Collisions.circleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
+      ) {
+        // this.scene.getObjectByName('player').position.y = enemy.position.y - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (Collisions.circleRectangleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.y = obstacle.position.y - obstacle.geometry.parameters.height/2
+      }
+      else this.scene.getObjectByName('player').position.y = nextMove
+    }
+    if(this.playerDown === 1) {
+      let nextMove = this.scene.getObjectByName('player').position.y - this.playerSpeedDown * delta
+
+      if (Collisions.circleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
+      ) {
+        // this.scene.getObjectByName('player').position.y = enemy.position.y + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (Collisions.circleRectangleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        this.scene.getObjectByName('player').position.y = obstacle.position.y + obstacle.geometry.parameters.height/2
+      }
+      else this.scene.getObjectByName('player').position.y = nextMove
+    }
+    if(this.playerLeft === 1) {
+      let nextMove = this.scene.getObjectByName('player').position.x - this.playerSpeedLeft * delta
+
+      if (Collisions.circleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
+      )) {
+        // this.scene.getObjectByName('player').position.x = enemy.position.x + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (Collisions.circleRectangleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.x = obstacle.position.x + obstacle.geometry.parameters.width/2
+      }
+      else this.scene.getObjectByName('player').position.x = nextMove
+    }
+    if(this.playerRight === 1) {
+      let nextMove = this.scene.getObjectByName('player').position.x + this.playerSpeedRight * delta
+
+      if (Collisions.circleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
+      )) {
+        // this.scene.getObjectByName('player').position.x = enemy.position.x - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (Collisions.circleRectangleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.x = obstacle.position.x - obstacle.geometry.parameters.width/2
+      }
+      else this.scene.getObjectByName('player').position.x = nextMove
+    }
+  }
+
   playerMovement() {
     if(this.playerUp) {
       this.scene.getObjectByName('player').position.y += this.playerSpeed * this.clock.getDelta()

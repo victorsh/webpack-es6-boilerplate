@@ -1,0 +1,6 @@
+https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_cubes_ortho.html
+https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
+https://codepen.io/Jobarbo/pen/zZMwVm?editors=1010
+http://www.jeffreythompson.org/collision-detection/circle-rect.php
+https://gero3.github.io/facetype.js/
+https://discoverthreejs.com/tips-and-tricks/
