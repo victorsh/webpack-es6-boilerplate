@@ -3,8 +3,10 @@ import * as THREE from 'three'
 import CaviarDreamFont from '../../fonts/CaviarDreams_Regular.json'
 import MargatroidGrotesqueFont from '../../fonts/MargatroidGrotesque.json'
 
-const COLOR_BACKGROUND = 0xA4F4C1
-const COLOR_PLAYER = 0x33F333
+const COLOR_BACKGROUND = 0xE7F4E7
+const COLOR_PLAYER = 0x77F577
+const COLOR_ENEMY = 0xF57777
+const COLOR_OBSTACLE = 0x7777F5
 const COLOR_WHITE = 0xFFFFFF
 const COLOR_BLACK = 0x000000
 const COLOR_MENU = 0xE3E3E3
@@ -81,22 +83,34 @@ export const setupObjects = (scene) => {
   scene.add(playMenuGroup)
 
   // Objects
-  let playerCircle = new THREE.Mesh(new THREE.CircleBufferGeometry(0.1, 36), new THREE.MeshBasicMaterial({ color: COLOR_PLAYER, side: THREE.DoubleSide }))
+  let playerCircle = new THREE.Mesh(
+    new THREE.CircleBufferGeometry(0.1, 36),
+    new THREE.MeshBasicMaterial({ color: COLOR_PLAYER })
+  )
   playerCircle.name = 'player'
   playerCircle.position.set(0, 0, 0)
   scene.add(playerCircle)
 
-  let enemyCircle = new THREE.Mesh(new THREE.CircleBufferGeometry(0.1, 36), new THREE.MeshBasicMaterial({ color: 0xF38888, side: THREE.DoubleSide }))
+  let enemyCircle = new THREE.Mesh(
+    new THREE.CircleBufferGeometry(0.1, 36),
+    new THREE.MeshBasicMaterial({ color: COLOR_ENEMY })
+  )
   enemyCircle.name = 'enemy'
   enemyCircle.position.set(0, -1, 0)
   scene.add(enemyCircle)
 
-  let plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1, 2), new THREE.MeshBasicMaterial({ color: 0x0000ff }))
+  let plane = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(1, 2),
+    new THREE.MeshBasicMaterial({ color: COLOR_OBSTACLE })
+  )
   plane.name = 'obstacle'
   plane.position.set(2, 0, 0)
   scene.add(plane)
 
-  let background = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 50), new THREE.MeshBasicMaterial({ color: COLOR_BACKGROUND, side: THREE.DoubleSide }))
+  let background = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(50, 50),
+    new THREE.MeshBasicMaterial({ color: COLOR_BACKGROUND })
+  )
   background.name = 'background'
   background.position.set(0, 0, -1)
   scene.add(background)

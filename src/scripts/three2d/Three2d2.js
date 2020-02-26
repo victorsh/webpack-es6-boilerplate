@@ -45,6 +45,10 @@ export default class Three2D {
     this.playerDown = false
     this.playerLeft = false
     this.playerRight = false
+    this.playerUpCollision = false
+    this.playerDownCollision = false
+    this.playerLeftCollision = false
+    this.playerRightCollision = false
     this.playerMovePause = false
 
     this.clock = new THREE.Clock()
@@ -119,19 +123,16 @@ export default class Three2D {
     let enemy = this.scene.getObjectByName('enemy')
     let obstacle = this.scene.getObjectByName('obstacle')
 
-    if (this.circleCollision(player.position.x, player.position.y, player.geometry.parameters.radius, enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)) {
-      console.log('circle-collision')
-    }
+    // if (this.circleCollision(player.position.x, player.position.y, player.geometry.parameters.radius, enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)) {
+    //   console.log('circle-collision')
+    // }
 
-    if (this.circleRectangleCollision(
-      player.position.x, player.position.y, player.geometry.parameters.radius,
-      obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
-    )) {
-      if(this.playerLeft === true) this.playerLeft = false
-      if(this.playerRight === true) this.playerRight = false
-      if(this.playerUp === true) this.playerUp = false
-      if(this.playerDown === true) this.playerDown = false
-    }
+    // if (this.circleRectangleCollision(
+    //   player.position.x, player.position.y, player.geometry.parameters.radius,
+    //   obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+    // )) {
+
+    // }
 
     this.camera.updateWorldMatrix()
   
@@ -154,17 +155,73 @@ export default class Three2D {
   }
 
   playerMovement(delta) {
+    let player = this.scene.getObjectByName('player')
+    let enemy = this.scene.getObjectByName('enemy')
+    let obstacle = this.scene.getObjectByName('obstacle')
+
     if(this.playerUp) {
-      this.scene.getObjectByName('player').position.y += this.playerSpeedUp * delta
+      let nextMove = this.scene.getObjectByName('player').position.y + this.playerSpeedUp * delta
+
+      if (this.circleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
+      ) {
+        // this.scene.getObjectByName('player').position.y = enemy.position.y - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (this.circleRectangleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.y = obstacle.position.y - obstacle.geometry.parameters.height/2
+      }
+      else this.scene.getObjectByName('player').position.y = nextMove
     }
     if(this.playerDown) {
-      this.scene.getObjectByName('player').position.y -= this.playerSpeedDown * delta
+      let nextMove = this.scene.getObjectByName('player').position.y - this.playerSpeedDown * delta
+
+      if (this.circleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius)
+      ) {
+        // this.scene.getObjectByName('player').position.y = enemy.position.y + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (this.circleRectangleCollision(
+        player.position.x, nextMove, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        this.scene.getObjectByName('player').position.y = obstacle.position.y + obstacle.geometry.parameters.height/2
+      }
+      else this.scene.getObjectByName('player').position.y = nextMove
     }
     if(this.playerLeft) {
-      this.scene.getObjectByName('player').position.x -= this.playerSpeedLeft * delta
+      let nextMove = this.scene.getObjectByName('player').position.x - this.playerSpeedLeft * delta
+
+      if (this.circleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
+      )) {
+        // this.scene.getObjectByName('player').position.x = enemy.position.x + (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (this.circleRectangleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.x = obstacle.position.x + obstacle.geometry.parameters.width/2
+      }
+      else this.scene.getObjectByName('player').position.x = nextMove
     }
     if(this.playerRight) {
-      this.scene.getObjectByName('player').position.x += this.playerSpeedRight * delta
+      let nextMove = this.scene.getObjectByName('player').position.x + this.playerSpeedRight * delta
+
+      if (this.circleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        enemy.position.x, enemy.position.y, enemy.geometry.parameters.radius
+      )) {
+        // this.scene.getObjectByName('player').position.x = enemy.position.x - (enemy.geometry.parameters.radius + player.geometry.parameters.radius)
+      } else if (this.circleRectangleCollision(
+        nextMove, player.position.y, player.geometry.parameters.radius,
+        obstacle.position.x, obstacle.position.y, obstacle.geometry.parameters.width, obstacle.geometry.parameters.height
+      )) {
+        // this.scene.getObjectByName('player').position.x = obstacle.position.x - obstacle.geometry.parameters.width/2
+      }
+      else this.scene.getObjectByName('player').position.x = nextMove
     }
   }
 
@@ -174,7 +231,7 @@ export default class Three2D {
     // this.oControls.enableRotate = true
     // this.oControls.enableZoom = true
     // this.oControls.zoomSpeed = 1
-    this.oControls.enablePan = true
+    this.oControls.enablePan = false
   
     this.tControls = new TransformControls(this.camera, this.renderer.domElement, this.oControls)
     this.tControls.setMode('translate')
@@ -281,7 +338,7 @@ export default class Three2D {
     return (x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2)
   }
 
-  circleRectangleCollision(cx, cy, r, rx, ry, rw, rh) {
+  circleRectangleCollision (cx, cy, r, rx, ry, rw, rh) {
     let circleDistanceX = Math.abs(cx - rx)
     let circleDistanceY = Math.abs(cy - ry)
 
