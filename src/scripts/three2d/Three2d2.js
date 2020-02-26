@@ -130,7 +130,7 @@ export default class Three2D {
       vx = (this.playerRight - this.playerLeft) * vxy / 2
       vy = (this.playerUp - this.playerDown) * vxy / 2
     }
-    
+    ``
     this.playerBody.velocity = [vx, vy]
   }
 
