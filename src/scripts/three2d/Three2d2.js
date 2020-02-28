@@ -23,18 +23,13 @@ export default class Three2D {
 
   init () {
     this.pause = false
-
-    this.startSpeed = 1
-    this.playerSpeed = 1
-    this.playerUp = 0
-    this.playerDown = 0
-    this.playerLeft = 0
-    this.playerRight = 0
-    this.playerUpCollision = false
-    this.playerDownCollision = false
-    this.playerLeftCollision = false
-    this.playerRightCollision = false
-    this.playerMovePause = false
+    this.player = {}
+    this.player.speed = 1
+    this.player.up = 0
+    this.player.down = 0
+    this.player.left = 0
+    this.player.right = 0
+    this.player.pause = false
 
     this.clock = new THREE.Clock()
 
@@ -59,7 +54,13 @@ export default class Three2D {
     this.camera.updateProjectionMatrix()
 
     // Setup Renderer
-    this.renderer = new THREE.WebGLRenderer()
+    this.selectedShader = 'fxaa'
+    if (this.selectedShader === 'default') {
+      this.renderer = new THREE.WebGLRenderer({ antialias: true })
+    } else {
+      this.renderer = new THREE.WebGLRenderer()
+    }
+    
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.autoClear = false
@@ -67,7 +68,6 @@ export default class Three2D {
     document.body.appendChild(this.renderer.domElement)
 
     // Setup Shaders
-    this.selectedShader = 'fxaa'
     this.effectComposer = new EffectComposer(this.renderer)
     this.renderPass = new RenderPass(this.scene, this.camera)
     this.effectComposer.addPass(this.renderPass)
@@ -93,19 +93,19 @@ export default class Three2D {
     this.setupEvents()
     setupObjects(this.scene)
 
-    // p2
+    // Create p2.js Physics
     this.world = new p2.World({
       gravity: [0, 0]
     })
 
-    this.playerBody = new p2.Body({
+    this.player.body = new p2.Body({
       mass: 1,
       fixedRotation: true,
       position: [0, 0],
       damping: 0.5
     })
-    this.playerBody.addShape(new p2.Circle({ radius: 0.1 }))
-    this.world.addBody(this.playerBody)
+    this.player.body.addShape(new p2.Circle({ radius: 0.1 }))
+    this.world.addBody(this.player.body)
 
     this.enemyBody = new p2.Body({ position: [0, -1] })
     this.enemyBody.addShape(new p2.Circle({ radius: 0.1}))
@@ -122,16 +122,15 @@ export default class Three2D {
   }
 
   handlePostStep () {
-    let vx = this.playerSpeed * (this.playerRight - this.playerLeft)
-    let vy = this.playerSpeed * (this.playerUp - this.playerDown)
+    let vx = this.player.speed * (this.player.right - this.player.left)
+    let vy = this.player.speed * (this.player.up - this.player.down)
 
     if (vx !== 0 && vy !== 0) {
       let vxy = Math.sqrt(vx*vx + vy*vy)
-      vx = (this.playerRight - this.playerLeft) * vxy / 2
-      vy = (this.playerUp - this.playerDown) * vxy / 2
+      vx = (this.player.right - this.player.left) * vxy / 2
+      vy = (this.player.up - this.player.down) * vxy / 2
     }
-    ``
-    this.playerBody.velocity = [vx, vy]
+    this.player.body.velocity = [vx, vy]
   }
 
   animate () {
@@ -140,16 +139,17 @@ export default class Three2D {
     requestAnimationFrame(this.animate.bind(this))
 
     let delta = this.clock.getDelta()
-
-    // this.playerMovement(delta)
     this.world.step(1/60, delta, 5)
-    this.scene.getObjectByName('player').position.set(this.playerBody.position[0], this.playerBody.position[1], 0)
+    this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
 
     this.camera.updateWorldMatrix()
 
-    // this.renderer.render(this.scene, this.camera)
-    this.effectComposer.render()
-
+    if (this.selectedShader === 'default') {
+      this.renderer.render(this.scene, this.camera)
+    } else {
+      this.effectComposer.render()
+    }
+    
     ///
     this.stats.end()
   }
@@ -250,13 +250,13 @@ export default class Three2D {
 
   handleKeyDown (event) {
     switch (event.code) {
-      case 'ArrowUp': this.playerUp = 1
+      case 'ArrowUp': this.player.up = 1
         break
-      case 'ArrowDown': this.playerDown = 1
+      case 'ArrowDown': this.player.down = 1
         break
-      case 'ArrowLeft': this.playerLeft = 1
+      case 'ArrowLeft': this.player.left = 1
         break
-      case 'ArrowRight': this.playerRight = 1
+      case 'ArrowRight': this.player.right = 1
         break
       case 'KeyP': this.pause ? this.pause = false : this.pause = true
         break
@@ -265,13 +265,13 @@ export default class Three2D {
 
   handleKeyUp (event) {
     switch (event.code) {
-      case 'ArrowUp': this.playerUp = 0
+      case 'ArrowUp': this.player.up = 0
         break
-      case 'ArrowDown': this.playerDown = 0
+      case 'ArrowDown': this.player.down = 0
         break
-      case 'ArrowLeft': this.playerLeft = 0
+      case 'ArrowLeft': this.player.left = 0
         break
-      case 'ArrowRight': this.playerRight = 0
+      case 'ArrowRight': this.player.right = 0
         break
     }
   }
