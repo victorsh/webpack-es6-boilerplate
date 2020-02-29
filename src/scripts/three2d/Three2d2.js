@@ -10,6 +10,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
 
 import { setupObjects } from './SceneObjects'
@@ -23,13 +24,6 @@ export default class Three2D {
 
   init () {
     this.pause = false
-    this.player = {}
-    this.player.speed = 1
-    this.player.up = 0
-    this.player.down = 0
-    this.player.left = 0
-    this.player.right = 0
-    this.player.pause = false
 
     this.clock = new THREE.Clock()
 
@@ -41,14 +35,16 @@ export default class Three2D {
 
     // Camera Setup
     this.frustumSize = 15
-    this.aspect = window.innerWidth / window.innerHeight
+    let aspect = window.innerWidth / window.innerHeight
     this.dis = 2
+    this.followPlayer = true
     this.camera = new THREE.OrthographicCamera
     (
-      this.frustumSize * this.aspect/-this.dis,
-      this.frustumSize * this.aspect/this.dis,
-      this.frustumSize/this.dis,
-      this.frustumSize/-this.dis, 1, 1000
+      -this.frustumSize * aspect / this.dis,
+      this.frustumSize * aspect / this.dis,
+      this.frustumSize / this.dis,
+      -this.frustumSize / this.dis,
+      1, 1000
     )
     this.camera.position.z = 10
     this.camera.updateProjectionMatrix()
@@ -89,33 +85,31 @@ export default class Three2D {
     this.stats.dom.style.height = 'auto'
     document.body.appendChild(this.stats.dom)
     
-    this.setupCameraControls()
-    this.setupEvents()
-    setupObjects(this.scene)
-
     // Create p2.js Physics
     this.world = new p2.World({
       gravity: [0, 0]
     })
 
-    this.player.body = new p2.Body({
-      mass: 1,
-      fixedRotation: true,
-      position: [0, 0],
-      damping: 0.5
-    })
-    this.player.body.addShape(new p2.Circle({ radius: 0.1 }))
-    this.world.addBody(this.player.body)
+    // Player Init
+    this.player = {}
+    this.enemies = []
+    this.walls = []
 
-    this.enemyBody = new p2.Body({ position: [0, -1] })
-    this.enemyBody.addShape(new p2.Circle({ radius: 0.1}))
-    this.world.addBody(this.enemyBody)
-
-    this.obstacleBody = new p2.Body({ position: [2, 0]})
-    this.obstacleBody.addShape(new p2.Box({ width: 1, height: 2}))
-    this.world.addBody(this.obstacleBody)
 
     this.world.on('postStep', this.handlePostStep.bind(this))
+    this.world.on('beginContact', (evt) => {
+      console.log(evt)
+    })
+    this.world.on('preSolve', (evt) => {
+      // console.log(evt)
+    })
+    this.world.on('endContact', (evt) => {
+      console.log(evt)
+    })
+
+    this.setupCameraControls()
+    this.setupEvents()
+    setupObjects(this.scene, this.player, this.enemies, this.walls,  this.world)
 
     // Run
     this.animate()
@@ -142,6 +136,7 @@ export default class Three2D {
     this.world.step(1/60, delta, 5)
     this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
 
+    if (this.followPlayer) this.camera.position.set(this.player.body.position[0], this.player.body.position[1], 10)
     this.camera.updateWorldMatrix()
 
     if (this.selectedShader === 'default') {
@@ -168,9 +163,9 @@ export default class Three2D {
   }
 
   onWindowResize() {
-    this.aspect = window.innerWidth / window.innerHeight
-    this.camera.left = -this.frustumSize * this.aspect / this.dis
-    this.camera.right = this.frustumSize * this.aspect / this.dis
+    let aspect = window.innerWidth / window.innerHeight
+    this.camera.left = -this.frustumSize * aspect / this.dis
+    this.camera.right = this.frustumSize * aspect / this.dis
     this.camera.top = this.frustumSize / this.dis
     this.camera.bottom = -this.frustumSize / this.dis
     this.camera.updateProjectionMatrix()

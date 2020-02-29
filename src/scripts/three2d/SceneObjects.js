@@ -7,9 +7,12 @@ import * as Colors from './Colors'
 import CaviarDreamFont from '../../fonts/CaviarDreams_Regular.json'
 import MargatroidGrotesqueFont from '../../fonts/MargatroidGrotesque.json'
 
-export const setupObjects = (scene) => {
+export const setupObjects = (scene, player, enemies, walls, world) => {
   createLights(scene)
-  createEntities(scene)
+  createEntities(scene, player, world)
+  createPlayer(scene, player, world)
+  createEnemies(scene, enemies, world)
+  createWalls(scene, walls, world)
   createTestMenuItem(scene)
   createTestFont(scene)
 }
@@ -24,31 +27,6 @@ const createLights = (scene) => {
 }
 
 const createEntities = (scene) => {
-  // Objects
-  let playerCircle = new THREE.Mesh(
-    new THREE.CircleBufferGeometry(0.1, 36),
-    new THREE.MeshBasicMaterial({ color: Colors.PLAYER })
-  )
-  playerCircle.name = 'player'
-  playerCircle.position.set(0, 0, 0)
-  scene.add(playerCircle)
-
-  let enemyCircle = new THREE.Mesh(
-    new THREE.CircleBufferGeometry(0.1, 36),
-    new THREE.MeshBasicMaterial({ color: Colors.ENEMY })
-  )
-  enemyCircle.name = 'enemy'
-  enemyCircle.position.set(0, -1, 0)
-  scene.add(enemyCircle)
-
-  let plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(1, 2),
-    new THREE.MeshBasicMaterial({ color: Colors.OBSTACLE })
-  )
-  plane.name = 'obstacle'
-  plane.position.set(2, 0, 0)
-  scene.add(plane)
-
   let background = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(50, 50),
     new THREE.MeshBasicMaterial({ color: Colors.BACKGROUND })
@@ -56,6 +34,70 @@ const createEntities = (scene) => {
   background.name = 'background'
   background.position.set(0, 0, -1)
   scene.add(background)
+}
+
+const createWalls = (scene, walls, world) => {
+  let wall = {}
+  wall.body = new p2.Body({ position: [2, 0]})
+  wall.body.addShape(new p2.Box({ width: 1, height: 2}))
+  world.addBody(wall.body)
+
+  let wallBox = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(1, 2),
+    new THREE.MeshBasicMaterial({ color: Colors.WALL })
+  )
+  wallBox.name = 'wall-'+1
+  wallBox.position.set(2, 0, 0)
+  scene.add(wallBox)
+
+  walls.push(wall)
+}
+
+const createEnemies = (scene, enemies, world) => {
+  let enemy = {}
+  enemy.body = new p2.Body({ position: [0, -1] })
+  enemy.body.name = 'enemy-'+1
+  enemy.body.addShape(new p2.Circle({
+    mass: 1,
+    radius: 0.1,
+    fixedRotation: true,
+  }))
+  world.addBody(enemy.body)
+
+  let enemyCircle = new THREE.Mesh(
+    new THREE.CircleBufferGeometry(0.1, 36),
+    new THREE.MeshBasicMaterial({ color: Colors.ENEMY })
+  )
+  enemyCircle.name = 'enemy-'+1
+  enemyCircle.position.set(0, -1, 0)
+  scene.add(enemyCircle)
+
+  enemies.push(enemy)
+}
+
+const createPlayer = (scene, player, world) => {
+  player.speed = 2
+  player.up = 0
+  player.down = 0
+  player.left = 0
+  player.right = 0
+  player.pause = false
+  player.body = new p2.Body({
+    mass: 1,
+    fixedRotation: true,
+    position: [0, 0],
+    damping: 0.5
+  })
+  player.body.addShape(new p2.Circle({ radius: 0.1 }))
+  world.addBody(player.body)
+
+  let playerCircle = new THREE.Mesh(
+    new THREE.CircleBufferGeometry(0.1, 36),
+    new THREE.MeshBasicMaterial({ color: Colors.PLAYER })
+  )
+  playerCircle.name = 'player'
+  playerCircle.position.set(0, 0, 0)
+  scene.add(playerCircle)
 }
 
 const createTestMenuItem = (scene) => {
