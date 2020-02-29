@@ -56,7 +56,6 @@ export default class Three2D {
     } else {
       this.renderer = new THREE.WebGLRenderer()
     }
-    
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.autoClear = false
@@ -95,7 +94,6 @@ export default class Three2D {
     this.enemies = []
     this.walls = []
 
-
     this.world.on('postStep', this.handlePostStep.bind(this))
     this.world.on('beginContact', (evt) => {
       console.log(evt)
@@ -110,21 +108,39 @@ export default class Three2D {
     this.setupCameraControls()
     this.setupEvents()
     setupObjects(this.scene, this.player, this.enemies, this.walls,  this.world)
-
     // Run
     this.animate()
   }
 
   handlePostStep () {
-    let vx = this.player.speed * (this.player.right - this.player.left)
-    let vy = this.player.speed * (this.player.up - this.player.down)
+    if (!this.pause) {
+      let vx = this.player.speed * (this.player.right - this.player.left)
+      let vy = this.player.speed * (this.player.up - this.player.down)
 
-    if (vx !== 0 && vy !== 0) {
-      let vxy = Math.sqrt(vx*vx + vy*vy)
-      vx = (this.player.right - this.player.left) * vxy / 2
-      vy = (this.player.up - this.player.down) * vxy / 2
+      if (vx !== 0 && vy !== 0) {
+        let vxy = Math.sqrt(vx*vx + vy*vy)
+        vx = (this.player.right - this.player.left) * vxy / 2
+        vy = (this.player.up - this.player.down) * vxy / 2
+      }
+      this.player.body.velocity = [vx, vy]
+
+      let px = this.player.body.position[0]
+      let py = this.player.body.position[1]
+
+      let ex = this.enemies[0].body.position[0]
+      let ey = this.enemies[0].body.position[1]
+
+      let dx = px - ex
+      let dy = py - ey
+
+      let adx = Math.abs(dx)
+      let ady = Math.abs(dy)
+
+      let evx = dx / (adx + ady)
+      let evy = dy / (adx + ady)
+
+      this.enemies[0].body.velocity = [evx, evy]
     }
-    this.player.body.velocity = [vx, vy]
   }
 
   animate () {
@@ -132,19 +148,21 @@ export default class Three2D {
     ///
     requestAnimationFrame(this.animate.bind(this))
 
-    let delta = this.clock.getDelta()
-    this.world.step(1/60, delta, 5)
-    this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
+    if (!this.pause) {
+      let delta = this.clock.getDelta()
+      this.world.step(1/60, delta, 5)
+      this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
+      this.scene.getObjectByName('enemy-0').position.set(this.enemies[0].body.position[0], this.enemies[0].body.position[1], 0)
 
-    if (this.followPlayer) this.camera.position.set(this.player.body.position[0], this.player.body.position[1], 10)
-    this.camera.updateWorldMatrix()
+      if (this.followPlayer) this.camera.position.set(this.player.body.position[0], this.player.body.position[1], 10)
+      this.camera.updateWorldMatrix()
 
-    if (this.selectedShader === 'default') {
-      this.renderer.render(this.scene, this.camera)
-    } else {
-      this.effectComposer.render()
+      if (this.selectedShader === 'default') {
+        this.renderer.render(this.scene, this.camera)
+      } else {
+        this.effectComposer.render()
+      }
     }
-    
     ///
     this.stats.end()
   }
@@ -211,11 +229,13 @@ export default class Three2D {
     this.raycaster.setFromCamera(this.mouse, this.camera)
     let intersects = this.raycaster.intersectObjects(this.scene.children, true)
 
-    if (intersects[0].object.name === 'playButton') {
-     this.scene.getObjectByName('playButton').material.color = new THREE.Color(0xFFAA11)
-      console.log('Play Button Hover')
-    } else {
-      this.scene.getObjectByName('playButton').material.color = new THREE.Color(Colors.MENU)
+    if(intersects.length > 0) {
+      if (intersects[0].object.name === 'playButton') {
+      this.scene.getObjectByName('playButton').material.color = new THREE.Color(0xFFAA11)
+        console.log('Play Button Hover')
+      } else {
+        this.scene.getObjectByName('playButton').material.color = new THREE.Color(Colors.MENU)
+      }
     }
   }
 
