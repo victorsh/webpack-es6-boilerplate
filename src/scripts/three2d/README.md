@@ -19,6 +19,9 @@ A 2D Game Engine built with Three JS and P2.
 - Refactor and Generalize
 - Import textures
 
+#### Note
+- Order short-hand: up right bottom left
+
 #### References
 https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_cubes_ortho.html
 https://stackoverflow.com/questions/17558085/three-js-orthographic-camera

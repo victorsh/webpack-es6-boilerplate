@@ -62,6 +62,8 @@ const createEnemies = (scene, enemies, world) => {
     let enemy = {}
     enemy.body = new p2.Body({ mass: 1, position: [enemyPositions[0][0], enemyPositions[0][1]] })
     enemy.body.addShape(new p2.Circle({ radius: 0.1 }))
+    enemy.name = 'enemy='+i
+    enemy.followPlayer = false
     world.addBody(enemy.body)
     enemies.push(enemy)
 
@@ -77,10 +79,10 @@ const createEnemies = (scene, enemies, world) => {
 
 const createPlayer = (scene, player, world) => {
   player.speed = 2
-  player.up = 0
-  player.down = 0
-  player.left = 0
-  player.right = 0
+
+  player.direction = [0, 0, 0, 0]
+  player.acceleration = [0, 0]
+
   player.pause = false
   player.body = new p2.Body({
     mass: 1,

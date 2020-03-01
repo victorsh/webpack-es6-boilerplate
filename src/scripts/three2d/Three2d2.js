@@ -106,16 +106,16 @@ export default class Three2D {
     })
 
     // Add Audio
-    this.listener = new THREE.AudioListener()
-    this.camera.add(this.listener)
-    this.sound = new THREE.Audio(this.listener)
+    // this.listener = new THREE.AudioListener()
+    // this.camera.add(this.listener)
+    // this.sound = new THREE.Audio(this.listener)
 
-    this.audioLoader = new THREE.AudioLoader()
-    this.audioLoader.load('https://localhost:8080/audio/game-sound.mp3', (buffer) => {
-      this.sound.setBuffer(buffer)
-      this.sound.setLoop(false)
-      this.sound.setVolume(0.5)
-    })
+    // this.audioLoader = new THREE.AudioLoader()
+    // this.audioLoader.load('https://localhost:8080/audio/game-sound.mp3', (buffer) => {
+    //   this.sound.setBuffer(buffer)
+    //   this.sound.setLoop(false)
+    //   this.sound.setVolume(0.5)
+    // })
 
     this.setupCameraControls()
     this.setupEvents()
@@ -126,32 +126,63 @@ export default class Three2D {
 
   handlePostStep () {
     if (!this.pause) {
-      let vx = this.player.speed * (this.player.right - this.player.left)
-      let vy = this.player.speed * (this.player.up - this.player.down)
+
+      let vx = this.player.speed * (this.player.direction[1] - this.player.direction[3])
+      let vy = this.player.speed * (this.player.direction[0] - this.player.direction[2])
 
       if (vx !== 0 && vy !== 0) {
         let vxy = Math.sqrt(vx*vx + vy*vy)
-        vx = (this.player.right - this.player.left) * vxy / 2
-        vy = (this.player.up - this.player.down) * vxy / 2
+        vx = (this.player.direction[1] - this.player.direction[3]) * vxy / 2
+        vy = (this.player.direction[0]- this.player.direction[2]) * vxy / 2
       }
-      this.player.body.velocity = [vx, vy]
 
-      let px = this.player.body.position[0]
-      let py = this.player.body.position[1]
+      if (this.player.direction[0] === 1) { // UP
+        if (this.player.acceleration[1] < 4) {
+          this.player.acceleration[1] += 0.1
+        }
+      } else if (this.player.direction[2] === 1) { // Down
+        if (this.player.acceleration[1] > -4) {
+          this.player.acceleration[1] -= 0.1
+        }
+      } else if (this.player.acceleration[1] > 0.09) {
+        this.player.acceleration[1] -= 0.05
+      } else if (this.player.acceleration[1] < -.09) {
+        this.player.acceleration[1] += 0.05
+      } else {
+        this.player.acceleration[1] = 0
+      }
 
-      let ex = this.enemies[0].body.position[0]
-      let ey = this.enemies[0].body.position[1]
+      if (this.player.direction[1] === 1) { // Right
+        if (this.player.acceleration[0] < 4) {
+          this.player.acceleration[0] += 0.1
+        }
+      } else if (this.player.direction[3] === 1) { // Left
+        if (this.player.acceleration[0] > -4) {
+          this.player.acceleration[0] -= 0.1
+        }
+      } else if (this.player.acceleration[0] > 0.09) {
+        this.player.acceleration[0] -= 0.05
+      } else if (this.player.acceleration[0] < -0.09) {
+        this.player.acceleration[0] += 0.05
+      } else {
+        this.player.acceleration[0] = 0
+      }
 
-      let dx = px - ex
-      let dy = py - ey
+      // console.log(this.player.acceleration)
 
-      let adx = Math.abs(dx)
-      let ady = Math.abs(dy)
+      this.player.body.velocity = [vx + this.player.acceleration[0], vy + this.player.acceleration[1]]
 
-      let evx = dx / (adx + ady)
-      let evy = dy / (adx + ady)
-
-      this.enemies[0].body.velocity = [evx, evy]
+      for (let i = 0; i < this.enemies.length; i++) {
+        if (this.enemies[i].followPlayer) {
+          const dx = this.player.body.position[0] - this.enemies[i].body.position[0]
+          const dy = this.player.body.position[1] - this.enemies[i].body.position[1]
+          const adx = Math.abs(dx)
+          const ady = Math.abs(dy)
+          const evx = dx / (adx + ady)
+          const evy = dy / (adx + ady)
+          this.enemies[0].body.velocity = [evx, evy]
+        }
+      }
     }
   }
 
@@ -277,13 +308,13 @@ export default class Three2D {
 
   handleKeyDown (event) {
     switch (event.code) {
-      case 'ArrowUp': this.player.up = 1
+      case 'ArrowUp': this.player.direction[0] = 1
         break
-      case 'ArrowDown': this.player.down = 1
+      case 'ArrowRight': this.player.direction[1] = 1
         break
-      case 'ArrowLeft': this.player.left = 1
+      case 'ArrowDown': this.player.direction[2] = 1
         break
-      case 'ArrowRight': this.player.right = 1
+      case 'ArrowLeft': this.player.direction[3] = 1
         break
       case 'KeyP': this.pause ? this.pause = false : this.pause = true
         break
@@ -292,13 +323,13 @@ export default class Three2D {
 
   handleKeyUp (event) {
     switch (event.code) {
-      case 'ArrowUp': this.player.up = 0; this.sound.play()
+      case 'ArrowUp': this.player.direction[0] = 0
         break
-      case 'ArrowDown': this.player.down = 0
+      case 'ArrowRight': this.player.direction[1] = 0
         break
-      case 'ArrowLeft': this.player.left = 0
+      case 'ArrowDown': this.player.direction[2] = 0
         break
-      case 'ArrowRight': this.player.right = 0
+      case 'ArrowLeft': this.player.direction[3] = 0
         break
     }
   }

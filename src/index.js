@@ -3,7 +3,7 @@ import './css/index.scss'
 // import * as Test from './scripts/test'
 // import * as PIXISTART from './scripts/pixi-starter'
 // import * as BABYLONSTART from './scripts/babylon-starter'
-// import * as tfex from './scripts/tfex'
+// import * as tfex from './scripts/tensorflow/tfex'
 // import Three2d from './scripts/Three2d'
 import Three2d2 from './scripts/three2d/Three2d2'
 
@@ -23,19 +23,14 @@ import Three2d2 from './scripts/three2d/Three2d2'
 
 //   return element
 // }
-
-// Test.test()
-
 // document.body.appendChild(component())
-
-// PIXISTART.pixelRun()
-
-// BABYLONSTART.babylonRunner()
-
-// tfex.runTF()
-// let t2d = new Three2d()
 
 // let ioon = io('http://localhost:9000')
 // ioon.on('sup', data => console.log(data))
+
+// Test.test()
+// PIXISTART.pixelRun()
+// BABYLONSTART.babylonRunner()
+// tfex.runTF()
 
 document.addEventListener('DOMContentLoaded', new Three2d2())
