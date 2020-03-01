@@ -27,3 +27,4 @@ http://www.jeffreythompson.org/collision-detection/circle-rect.php
 https://gero3.github.io/facetype.js/
 https://discoverthreejs.com/tips-and-tricks/
 https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+https://developer.mozilla.org/en-US/docs/Games/Techniques

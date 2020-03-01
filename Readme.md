@@ -1,8 +1,8 @@
-# SPA/PWA Webpack Boilerplate
+# PWA Webpack Boilerplate with es6 Support
 
 A boilerplate for building Single Page Applications
 
-# Installation
+#### Installation
 - `brew install nss`
 - `npm i`
 - `npm run nodedev`: Run node development server with backend
@@ -11,27 +11,25 @@ A boilerplate for building Single Page Applications
 - `npm run stage`: Build and run production build
 - `npm run build`: Build production distribution
 - `npm clean`: Clean remove production build
-
-# Generate Font
-- `cd utils`
-- `msdf-bmfont -o ./fontout/font.png -t msdf ./fonts/CaviarDreams.ttf`
+- Public folder: `src/assets`
 
 #### What's Included
 - Webpack Dev and Production Configuration
 - eslinting
 - SASS
 - Progressive Web App
-- PixiJS
 - Sample Backend Server
-- Three2d
+- Socket.io font and backend
+- Tensorflow JS
+- BabylonJS
+- PixiJS
+- [Three2d](src/scripts/three2d/README.md)
 
 #### TODO
 - [ ] Add support for capacitor
 - [ ] Further optimize webpack production build
 - [ ] Add Unit Tests
 
-####
-- https://developer.mozilla.org/en-US/docs/Games/Techniques
 
 # Going Beyond
 
