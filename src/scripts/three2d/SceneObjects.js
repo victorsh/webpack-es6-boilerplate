@@ -9,7 +9,7 @@ import MargatroidGrotesqueFont from '../../fonts/MargatroidGrotesque.json'
 
 export const setupObjects = (scene, player, enemies, walls, world) => {
   createLights(scene)
-  createEntities(scene, player, world)
+  createBackground(scene, player, world)
   createPlayer(scene, player, world)
   createEnemies(scene, enemies, world)
   createWalls(scene, walls, world)
@@ -26,7 +26,7 @@ const createLights = (scene) => {
   scene.add(lightDirectional)
 }
 
-const createEntities = (scene) => {
+const createBackground = (scene) => {
   let background = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(50, 50),
     new THREE.MeshBasicMaterial({ color: Colors.BACKGROUND })
@@ -54,7 +54,6 @@ const createWalls = (scene, walls, world) => {
     wallBox.position.set(wallPositions[i][0], wallPositions[i][1], wallPositions[i][2])
     scene.add(wallBox)
   }
-
 }
 
 const createEnemies = (scene, enemies, world) => {

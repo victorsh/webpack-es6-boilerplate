@@ -105,6 +105,18 @@ export default class Three2D {
       console.log(evt)
     })
 
+    // Add Audio
+    this.listener = new THREE.AudioListener()
+    this.camera.add(this.listener)
+    this.sound = new THREE.Audio(this.listener)
+
+    this.audioLoader = new THREE.AudioLoader()
+    this.audioLoader.load('https://localhost:8080/audio/game-sound.mp3', (buffer) => {
+      this.sound.setBuffer(buffer)
+      this.sound.setLoop(false)
+      this.sound.setVolume(0.5)
+    })
+
     this.setupCameraControls()
     this.setupEvents()
     setupObjects(this.scene, this.player, this.enemies, this.walls,  this.world)
@@ -280,7 +292,7 @@ export default class Three2D {
 
   handleKeyUp (event) {
     switch (event.code) {
-      case 'ArrowUp': this.player.up = 0
+      case 'ArrowUp': this.player.up = 0; this.sound.play()
         break
       case 'ArrowDown': this.player.down = 0
         break

@@ -1,6 +1,6 @@
 const path = require('path')
-const webpack = require('webpack')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
@@ -15,9 +15,12 @@ module.exports = {
       swSrc: path.resolve(__dirname, '../src/src-sw.js'),
       swDest: 'sw.js'
     }),
-    new webpack.ProvidePlugin({
-      THREE: 'three'
-    })
+    new CopyWebpackPlugin([
+      { from: path.resolve(__dirname, '../src/assets'), to: path.resolve(__dirname, '../dist') }
+    ])
+    // new webpack.ProvidePlugin({
+    //   THREE: 'three'
+    // })
   ],
   output: {
     filename: 'main.js',

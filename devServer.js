@@ -22,7 +22,7 @@ console.log(path.resolve(__dirname, './dist'))
 
 app.use(
   middleware(compiler, {
-    // webpack-dev-middleware options
+    // publicPath: path.resolve(__dirname, 'dist')
   })
 )
 

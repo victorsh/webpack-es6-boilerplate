@@ -43,3 +43,7 @@ A boilerplate for building Single Page Applications
 
 # Other
 - Unlock Chrome Framerate: `open -a "Google Chrome" --args --disable-gpu-vsync`
+
+
+# BUGS
+- Camera rotates zx axis on click for no reason.
