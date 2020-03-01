@@ -5,6 +5,7 @@ import './css/index.scss'
 // import * as tfex from './scripts/tfex'
 // import Three2d from './scripts/Three2d'
 import Three2d2 from './scripts/three2d/Three2d2'
+import io from 'socket.io-client'
 
 // if ('serviceWorker' in navigator) {
 //   window.addEventListener('load', () => {
@@ -33,4 +34,8 @@ import Three2d2 from './scripts/three2d/Three2d2'
 
 // tfex.runTF()
 // let t2d = new Three2d()
+
+let ioon = io('http://localhost:9000')
+ioon.on('sup', data => console.log(data))
+
 document.addEventListener('DOMContentLoaded', new Three2d2())
