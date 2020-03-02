@@ -148,34 +148,35 @@ export default class Three2D {
         vy = (this.player.direction[0]- this.player.direction[2]) * vxy / 2
       }
 
-      if (this.player.direction[0] === 1) { // UP
-        if (this.player.acceleration[1] < 4) {
-          this.player.acceleration[1] += 0.1
-        }
-      } else if (this.player.direction[2] === 1) { // Down
-        if (this.player.acceleration[1] > -4) {
-          this.player.acceleration[1] -= 0.1
-        }
-      } else if (this.player.acceleration[1] > 0.09) {
-        this.player.acceleration[1] -= 0.05
-      } else if (this.player.acceleration[1] < -.09) {
-        this.player.acceleration[1] += 0.05
+      let accelMax = 4
+      let accelDeadZone = 0.09
+      let accelResistance = 0.01
+      let accelEffect = 0.1
+
+      // Independent acceleration change is effecting acceleration reduction.
+      // When up 2 seconds then Left 1 second. Left goes to 0 before Up goes to 0
+      if (this.player.direction[0] === 1 && this.player.acceleration[1] <= accelMax) { // UP
+        this.player.acceleration[1] += accelEffect
+      } else if (this.player.direction[2] === 1 && this.player.acceleration[1] >= -accelMax) { // Down
+        this.player.acceleration[1] -= accelEffect
+      }
+      if (this.player.acceleration[1] >= accelDeadZone) {
+        this.player.acceleration[1] -= accelResistance
+      } else if (this.player.acceleration[1] <= -accelDeadZone) {
+        this.player.acceleration[1] += accelResistance
       } else {
         this.player.acceleration[1] = 0
       }
 
-      if (this.player.direction[1] === 1) { // Right
-        if (this.player.acceleration[0] < 4) {
-          this.player.acceleration[0] += 0.1
-        }
-      } else if (this.player.direction[3] === 1) { // Left
-        if (this.player.acceleration[0] > -4) {
-          this.player.acceleration[0] -= 0.1
-        }
-      } else if (this.player.acceleration[0] > 0.09) {
-        this.player.acceleration[0] -= 0.05
-      } else if (this.player.acceleration[0] < -0.09) {
-        this.player.acceleration[0] += 0.05
+      if (this.player.direction[1] === 1 && this.player.acceleration[0] <= accelMax) { // Right
+        this.player.acceleration[0] += accelEffect
+      } else if (this.player.direction[3] === 1 && this.player.acceleration[0] >= -accelMax) { // Left
+        this.player.acceleration[0] -= accelEffect
+      }
+      if (this.player.acceleration[0] >= accelDeadZone) {
+        this.player.acceleration[0] -= accelDeadZone
+      } else if (this.player.acceleration[0] <= -accelDeadZone) {
+        this.player.acceleration[0] += accelDeadZone
       } else {
         this.player.acceleration[0] = 0
       }
