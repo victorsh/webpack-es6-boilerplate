@@ -13,8 +13,8 @@ export const setupObjects = (scene, player, enemies, walls, world) => {
   createPlayer(scene, player, world)
   createEnemies(scene, enemies, world)
   createWalls(scene, walls, world)
-  // createTestMenuItem(scene)
-  // createTestFont(scene)
+  createTestMenuItem(scene)
+  createTestFont(scene)
 }
 
 const createLights = (scene) => {
@@ -68,14 +68,14 @@ const createWalls = (scene, walls, world) => {
 }
 
 const createEnemies = (scene, enemies, world) => {
-  let enemyPositions = [[0, -1]]
+  let enemyPositions = [[0, -1], [1, 0], [1, 1], [2, 1], [1, 2], [-1,1], [-1, -1], [2, -1], [-2, -1]]
   for (let i = 0; i < enemyPositions.length; i++) {
     let enemy = {}
     
     enemy.body = new p2.Body({
       mass: 1,
       fixedRotation: true,
-      position: [enemyPositions[0][0], enemyPositions[0][1]]
+      position: [enemyPositions[i][0], enemyPositions[i][1]]
     })
     
     enemy.body.addShape(new p2.Circle({
@@ -84,7 +84,7 @@ const createEnemies = (scene, enemies, world) => {
     }))
     
     enemy.body.name = 'enemy-'+i
-    enemy.followPlayer = false
+    enemy.followPlayer = true
     world.addBody(enemy.body)
     enemies.push(enemy)
 
@@ -93,7 +93,7 @@ const createEnemies = (scene, enemies, world) => {
       new THREE.MeshBasicMaterial({ color: Colors.ENEMY })
     )
     enemyCircle.name = 'enemy-'+i
-    enemyCircle.position.set(enemyPositions[0][0], enemyPositions[0][1], 0)
+    enemyCircle.position.set(enemyPositions[i][0], enemyPositions[i][1], 0)
     scene.add(enemyCircle)
   }
 }

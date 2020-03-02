@@ -44,7 +44,7 @@ export default class Three2D {
     this.frustumSize = 15
     let aspect = window.innerWidth / window.innerHeight
     this.dis = 2
-    this.followPlayer = false
+    this.followPlayer = true
     this.camera = new THREE.OrthographicCamera
     (
       -this.frustumSize * aspect / this.dis,
@@ -59,9 +59,9 @@ export default class Three2D {
     // Setup Renderer
     this.selectedShader = 'default'
     if (this.selectedShader === 'default') {
-      this.renderer = new THREE.WebGLRenderer({ antialias: true })
+      this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })
     } else {
-      this.renderer = new THREE.WebGLRenderer()
+      this.renderer = new THREE.WebGLRenderer({ powerPreference: 'high-performance', preserveDrawingBuffer: false })
     }
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -192,7 +192,7 @@ export default class Three2D {
           const ady = Math.abs(dy)
           const evx = dx / (adx + ady)
           const evy = dy / (adx + ady)
-          this.enemies[0].body.velocity = [evx, evy]
+          this.enemies[i].body.velocity = [evx, evy]
         }
       }
     }
@@ -206,11 +206,19 @@ export default class Three2D {
     if (!this.pause) {
       let delta = this.clock.getDelta()
       this.world.step(1/60, delta, 1)
+      
       this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
-      // this.scene.getObjectByName('enemy-0').position.set(this.enemies[0].body.position[0], this.enemies[0].body.position[1], 0)
+
+      for (let i = 0; i < this.enemies.length; i++) {
+        this.scene.getObjectByName('enemy-'+i).position.set(this.enemies[i].body.position[0], this.enemies[i].body.position[1], 0)
+      }
+
+      for (let i = 0; i < this.walls.length; i++) {
+        this.scene.getObjectByName('wall-'+i).position.set(this.walls[i].body.position[0], this.walls[i].body.position[1], 0)
+      }
 
       if (this.followPlayer) this.camera.position.set(this.player.body.position[0], this.player.body.position[1], 10)
-      // this.camera.updateWorldMatrix()
+      this.camera.updateWorldMatrix()
 
       if (this.selectedShader === 'default') {
         this.renderer.render(this.scene, this.camera)
