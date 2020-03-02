@@ -13,8 +13,8 @@ export const setupObjects = (scene, player, enemies, walls, world) => {
   createPlayer(scene, player, world)
   createEnemies(scene, enemies, world)
   createWalls(scene, walls, world)
-  createTestMenuItem(scene)
-  createTestFont(scene)
+  // createTestMenuItem(scene)
+  // createTestFont(scene)
 }
 
 const createLights = (scene) => {
@@ -37,17 +37,28 @@ const createBackground = (scene) => {
 }
 
 const createWalls = (scene, walls, world) => {
-  let wallPositions = [[-5, 0, 0], [5, 0, 0], [0, 5, 0], [0, -5, 0], [2, 0, 0]]
+  let wallPositions = [[-8, 0, 0], [8, 0, 0], [0, 8, 0], [0, -8, 0], [4, 0, 0]]
   for (let i = 0; i < wallPositions.length; i++) {
     let wall = {}
-    wall.body = new p2.Body({ position: [wallPositions[i][0], wallPositions[i][1]]})
-    wall.body.addShape(new p2.Box({ width: 1, height: 2}))
+
+    wall.body = new p2.Body({ 
+      mass: 0, 
+      position: [wallPositions[i][0], wallPositions[i][1]],
+      type: p2.Body.KINEMATIC
+    })
+
+    wall.body.addShape(new p2.Box({
+      width: 1,
+      height: 5,
+      material: p2.Material()
+    }))
+
     wall.body.name = 'wall-'+i
     world.addBody(wall.body)
     walls.push(wall)
   
     let wallBox = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(1, 2),
+      new THREE.PlaneBufferGeometry(1, 5),
       new THREE.MeshBasicMaterial({ color: Colors.WALL })
     )
     wallBox.name = 'wall-'+i
@@ -60,9 +71,19 @@ const createEnemies = (scene, enemies, world) => {
   let enemyPositions = [[0, -1]]
   for (let i = 0; i < enemyPositions.length; i++) {
     let enemy = {}
-    enemy.body = new p2.Body({ mass: 1, position: [enemyPositions[0][0], enemyPositions[0][1]] })
-    enemy.body.addShape(new p2.Circle({ radius: 0.1 }))
-    enemy.name = 'enemy='+i
+    
+    enemy.body = new p2.Body({
+      mass: 1,
+      fixedRotation: true,
+      position: [enemyPositions[0][0], enemyPositions[0][1]]
+    })
+    
+    enemy.body.addShape(new p2.Circle({
+      radius: 0.1,
+      material: p2.Material()
+    }))
+    
+    enemy.body.name = 'enemy-'+i
     enemy.followPlayer = false
     world.addBody(enemy.body)
     enemies.push(enemy)
@@ -79,18 +100,23 @@ const createEnemies = (scene, enemies, world) => {
 
 const createPlayer = (scene, player, world) => {
   player.speed = 2
+  player.pause = false
 
   player.direction = [0, 0, 0, 0]
   player.acceleration = [0, 0]
 
-  player.pause = false
   player.body = new p2.Body({
     mass: 1,
     fixedRotation: true,
     position: [0, 0],
     damping: 0.5
   })
-  player.body.addShape(new p2.Circle({ radius: 0.1 }))
+  
+  player.body.addShape(new p2.Circle({
+    radius: 0.1,
+    material: p2.Material()
+  }))
+  player.body.name = 'player'
   world.addBody(player.body)
 
   let playerCircle = new THREE.Mesh(

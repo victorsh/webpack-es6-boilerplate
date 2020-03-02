@@ -19,7 +19,14 @@ import * as Colors from './Colors'
 
 export default class Three2D {
   constructor () {
+    this.createUI()
     this.init()
+  }
+
+  createUI () {
+    let box = document.createElement('div')
+    box.style = 'position: fixed; height: 50px; width: 100%; background: #FF0000; opacity: 0.7; top: 10; z-index: 2'
+    document.body.appendChild(box)
   }
 
   init () {
@@ -37,7 +44,7 @@ export default class Three2D {
     this.frustumSize = 15
     let aspect = window.innerWidth / window.innerHeight
     this.dis = 2
-    this.followPlayer = true
+    this.followPlayer = false
     this.camera = new THREE.OrthographicCamera
     (
       -this.frustumSize * aspect / this.dis,
@@ -50,7 +57,7 @@ export default class Three2D {
     this.camera.updateProjectionMatrix()
 
     // Setup Renderer
-    this.selectedShader = 'fxaa'
+    this.selectedShader = 'default'
     if (this.selectedShader === 'default') {
       this.renderer = new THREE.WebGLRenderer({ antialias: true })
     } else {
@@ -96,13 +103,18 @@ export default class Three2D {
 
     this.world.on('postStep', this.handlePostStep.bind(this))
     this.world.on('beginContact', (evt) => {
-      console.log(evt)
+      if(evt.shapeA.body.name !== 'player' && evt.shapeB.body.name !== 'player') return;
+      // Who am I making contact with? Is it an enemy or a wall.
+
     })
     this.world.on('preSolve', (evt) => {
       // console.log(evt)
+      // Depending on who I'm making contact with, what do I do?
+      // evt.contactEquations[i]
+      // evt.frictionEquations[i]
     })
     this.world.on('endContact', (evt) => {
-      console.log(evt)
+      // console.log(evt)
     })
 
     // Add Audio
@@ -187,18 +199,18 @@ export default class Three2D {
   }
 
   animate () {
-    this.stats.begin()
+    // this.stats.begin()
     ///
     requestAnimationFrame(this.animate.bind(this))
 
     if (!this.pause) {
       let delta = this.clock.getDelta()
-      this.world.step(1/60, delta, 5)
+      this.world.step(1/60, delta, 1)
       this.scene.getObjectByName('player').position.set(this.player.body.position[0], this.player.body.position[1], 0)
-      this.scene.getObjectByName('enemy-0').position.set(this.enemies[0].body.position[0], this.enemies[0].body.position[1], 0)
+      // this.scene.getObjectByName('enemy-0').position.set(this.enemies[0].body.position[0], this.enemies[0].body.position[1], 0)
 
       if (this.followPlayer) this.camera.position.set(this.player.body.position[0], this.player.body.position[1], 10)
-      this.camera.updateWorldMatrix()
+      // this.camera.updateWorldMatrix()
 
       if (this.selectedShader === 'default') {
         this.renderer.render(this.scene, this.camera)
@@ -207,7 +219,7 @@ export default class Three2D {
       }
     }
     ///
-    this.stats.end()
+    // this.stats.end()
   }
 
   setupCameraControls() {
