@@ -104,6 +104,7 @@ const createPlayer = (scene, player, world) => {
 
   player.direction = [0, 0, 0, 0]
   player.acceleration = [0, 0]
+  player.staticAcceleration = 0
 
   player.body = new p2.Body({
     mass: 1,

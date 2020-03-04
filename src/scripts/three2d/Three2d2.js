@@ -57,7 +57,7 @@ export default class Three2D {
     this.camera.updateProjectionMatrix()
 
     // Setup Renderer
-    this.selectedShader = 'default'
+    this.selectedShader = 'smaa'
     if (this.selectedShader === 'default') {
       this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })
     } else {
@@ -181,9 +181,16 @@ export default class Three2D {
         this.player.acceleration[0] = 0
       }
 
+      // if(this.player.direction[0] + this.player.direction[1] + this.player.direction[2] + this.player.direction[3] > 0) {
+      //   this.player.staticAcceleration = Math.min(this.player.staticAcceleration + 0.1, 4)
+      // } else {
+      //   this.player.staticAcceleration = Math.max(this.player.staticAcceleration - 0.1, 0)
+      // }
+
       // console.log(this.player.acceleration)
 
       this.player.body.velocity = [vx + this.player.acceleration[0], vy + this.player.acceleration[1]]
+      // this.player.body.velocity = [vx + this.player.staticAcceleration, vy + this.player.staticAcceleration]
 
       for (let i = 0; i < this.enemies.length; i++) {
         if (this.enemies[i].followPlayer) {

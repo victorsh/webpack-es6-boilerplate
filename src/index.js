@@ -1,10 +1,13 @@
 import './css/index.scss'
 // import io from 'socket.io-client'
+
 // import * as Test from './scripts/test'
 // import * as PIXISTART from './scripts/pixi-starter'
 // import * as BABYLONSTART from './scripts/babylon-starter'
-// import * as tfex from './scripts/tensorflow/tfex'
-// import Three2d from './scripts/Three2d'
+
+// import * as tfex from './scripts/tensorflow/tfex-mpg'
+// import * as tfex from './script/tensorflow/tfex-mem-leak'
+
 import Three2d2 from './scripts/three2d/Three2d2'
 
 // if ('serviceWorker' in navigator) {

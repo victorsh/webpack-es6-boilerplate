@@ -5,9 +5,11 @@ import * as tfvis from '@tensorflow/tfjs-vis'
  * An example of training and predicting using a neural net and tensorflow.
  *
  * Example of Linear Regression: Tries to fit a line to trend present in the input data
+ *
+ * Playlist For TFJS tutorials: https://www.youtube.com/watch?v=Qt3ZABW5lD0&list=PLRqwX-V7Uu6YIeVA3dNxbR9PYj4wV31oQ
  */
 export const runTF = async () => {
-  document.addEventListener('DOMContentLoaded', run)
+  document.addEventListener('DOMContentLoaded', await run())
 }
 
 // Main function
